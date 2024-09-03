@@ -6,12 +6,13 @@ export interface IFlyDomainConfig {
   domainName: string;
 }
 
-export class FlyDomain extends StackConstruct {
+export class Domain extends StackConstruct {
   domainName: string;
 
   constructor(stack: FlyStack, name: string, config: IFlyDomainConfig) {
     super(stack, name);
     this.domainName = config.domainName;
+    this.initialize();
   }
 
   synthesize(): Record<string, any> {

@@ -1,5 +1,5 @@
 import type { FlyStack } from "../core/FlyStack";
-import type { FlyCertificate } from "./FlyCertificate";
+import type { Certificate } from "./Certificate";
 import type { FlySecret } from "./FlySecret";
 import type { AnycastIP } from "./AnycastIP";
 import type { FlyProxy } from "./FlyProxy";
@@ -8,7 +8,7 @@ import { StackConstruct } from "./StackConstruct";
 export interface IFlyAppConfig {
   name: string;
   domain: string;
-  certificate: FlyCertificate;
+  certificate: Certificate;
   secrets: FlySecret[];
   env: Record<string, string>;
   publicServices: {
@@ -25,6 +25,7 @@ export class FlyApp extends StackConstruct {
   constructor(stack: FlyStack, name: string, config: IFlyAppConfig) {
     super(stack, name);
     this.config = config;
+    this.initialize();
   }
 
   synthesize(): Record<string, any> {

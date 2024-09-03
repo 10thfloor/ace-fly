@@ -15,6 +15,7 @@ export class TlsConfig extends StackConstruct {
   constructor(stack: FlyStack, name: string, config: ITlsConfig) {
     super(stack, name);
     this.config = config;
+    this.initialize();
   }
 
   synthesize(): Record<string, any> {

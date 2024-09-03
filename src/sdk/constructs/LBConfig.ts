@@ -16,6 +16,7 @@ export class LBConfig extends StackConstruct {
   constructor(stack: FlyStack, name: string, config: ILBConfig) {
     super(stack, name);
     this.config = config;
+    this.initialize();
   }
 
   synthesize(): Record<string, any> {

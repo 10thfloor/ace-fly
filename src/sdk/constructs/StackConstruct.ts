@@ -8,6 +8,9 @@ export abstract class StackConstruct {
   constructor(stack: FlyStack, name: string) {
     this.stack = stack;
     this.name = name;
+  }
+
+  initialize(): void {
     if (this.validate()) {
       this.stack.addResource(this);
     } else {

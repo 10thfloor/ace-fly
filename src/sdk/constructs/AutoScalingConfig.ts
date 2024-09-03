@@ -14,6 +14,7 @@ export class AutoScalingConfig extends StackConstruct {
   constructor(stack: FlyStack, name: string, config: IAutoScalingConfig) {
     super(stack, name);
     this.config = config;
+    this.initialize();
   }
 
   synthesize(): Record<string, any> {

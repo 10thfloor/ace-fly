@@ -17,6 +17,7 @@ export class FlyPostgresReplica extends StackConstruct {
   constructor(stack: FlyStack, name: string, config: IFlyPostgresReplicaConfig) {
     super(stack, name);
     this.config = config;
+    this.initialize();
   }
 
   synthesize(): Record<string, any> {

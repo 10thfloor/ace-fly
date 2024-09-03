@@ -12,6 +12,7 @@ export class FlyVolume extends StackConstruct {
   constructor(stack: FlyStack, name: string, config: IFlyVolumeConfig) {
     super(stack, name);
     this.config = config;
+    this.initialize();
   }
 
   synthesize(): Record<string, any> {

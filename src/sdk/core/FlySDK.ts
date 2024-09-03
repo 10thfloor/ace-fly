@@ -13,10 +13,6 @@ export class FlySDK {
     this.apiClient = new FlyApiClient(config.apiToken);
   }
 
-  createStack(name: string): FlyStack {
-    return new FlyStack(this, name);
-  }
-
   getApiClient(): FlyApiClient {
     return this.apiClient;
   }

@@ -1,7 +1,7 @@
-export class AceDevServer {
+export class DevServer {
   start(): void {
     // TODO: Implement local development server
-    console.log('ACE local development server started');
+    console.log('local development server started');
   }
 
   stop(): void {

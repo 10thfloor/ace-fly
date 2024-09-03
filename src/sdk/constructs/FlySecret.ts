@@ -11,6 +11,7 @@ export class FlySecret extends StackConstruct {
   constructor(stack: FlyStack, name: string, config: IFlySecretConfig) {
     super(stack, name);
     this.config = config;
+    this.initialize();
   }
 
   synthesize(): Record<string, any> {

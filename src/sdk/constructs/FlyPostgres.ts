@@ -24,6 +24,7 @@ export class FlyPostgres extends StackConstruct {
   constructor(stack: FlyStack, name: string, config: IFlyPostgresConfig) {
     super(stack, name);
     this.config = config;
+    this.initialize();
   }
 
   synthesize(): Record<string, any> {

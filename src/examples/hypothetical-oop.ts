@@ -1,8 +1,8 @@
 import { FlySDK, type IFlySDKConfig } from "../sdk/core/FlySDK.js";
 import { FlyStack } from "../sdk/core/FlyStack.js";
 import { FlyOrg } from "../sdk/core/FlyOrg.js";
-import { FlyDomain } from "../sdk/constructs/FlyDomain.js";
-import { FlyCertificate } from "../sdk/constructs/FlyCertificate.js";
+import { Domain } from "../sdk/constructs/Domain.js";
+import { Certificate } from "../sdk/constructs/Certificate.js";
 import { FlySecret } from "../sdk/constructs/FlySecret.js";
 import { FlyVolume } from "../sdk/constructs/FlyVolume.js";
 import { FlyPostgres } from "../sdk/constructs/FlyPostgres.js";
@@ -16,56 +16,66 @@ import { FlyProxy } from "../sdk/constructs/FlyProxy.js";
 import { AnycastIP } from "../sdk/constructs/AnycastIP.js";
 import { FlyApp } from "../sdk/constructs/FlyApp.js";
 
-
 class FlyDeplyment extends FlySDK {
+	readonly stack: FlyStack;
+
 	constructor(context: IFlySDKConfig) {
 		super(context);
 
-		const Stack = new FlyStack(this, "my-stack");
-		const DevEnvironemnt = new FlyOrg(Stack, "dev");
+		this.stack = new FlyStack(this, "my-stack");
 
-		const devDomain = new FlyDomain(Stack, "my-domain", {
+		const DevEnvironemnt = new FlyOrg(this.stack, "dev");
+
+		const devDomain = new Domain(this.stack, "my-domain", {
 			domainName: "my-app.dev.fly.dev",
 		});
 
-		const devDomainCertificate = new FlyCertificate(Stack, "my-certificate", {
+		const devDomainCertificate = new Certificate(this.stack, "my-certificate", {
 			name: "my-certificate",
 			domains: devDomain.domainName,
 		});
 
-		const secret = new FlySecret(Stack, "my-secret", {
+		const secret = new FlySecret(this.stack, "my-secret", {
 			key: "my-secret",
 		});
 
-		const dbPassword = new FlySecret(Stack, "db-password", {
+		const dbPassword = new FlySecret(this.stack, "db-password", {
 			key: "password",
 		});
 
-		const webVolume = new FlyVolume(Stack, "my-volume", {
+		const webVolume = new FlyVolume(this.stack, "my-volume", {
 			name: "web-volume",
 			size: "100GB",
 		});
 
-		const apiVolume = new FlyVolume(Stack, "my-volume", {
+		const apiVolume = new FlyVolume(this.stack, "my-volume", {
 			name: "api-volume",
 			size: "100GB",
 		});
 
-		const apiAutoScaling = new AutoScalingConfig(Stack, "api-auto-scaling", {
-			minMachines: 1,
-			maxMachines: 5,
-			targetCPUUtilization: 70,
-			scaleToZero: true, 
-		});
+		const apiAutoScaling = new AutoScalingConfig(
+			this.stack,
+			"api-auto-scaling",
+			{
+				minMachines: 1,
+				maxMachines: 5,
+				targetCPUUtilization: 70,
+				scaleToZero: true,
+			},
+		);
 
-		const webAutoScaling = new AutoScalingConfig(Stack, "web-auto-scaling", {
-			minMachines: 1,
-			maxMachines: 5,
-			targetCPUUtilization: 70,
-			scaleToZero: true, 
-		});
+		const webAutoScaling = new AutoScalingConfig(
+			this.stack,
+			"web-auto-scaling",
+			{
+				minMachines: 1,
+				maxMachines: 5,
+				targetCPUUtilization: 70,
+				scaleToZero: true,
+			},
+		);
 
-		const APIdatabase = new FlyPostgres(Stack, "api-database", {
+		const APIdatabase = new FlyPostgres(this.stack, "api-database", {
 			name: "my-database",
 			region: "sfo",
 			credentials: {
@@ -73,7 +83,7 @@ class FlyDeplyment extends FlySDK {
 				password: dbPassword,
 			},
 			replicas: [
-				new FlyPostgresReplica(Stack, "api-database-replica", {
+				new FlyPostgresReplica(this.stack, "api-database-replica", {
 					name: "my-database-replica",
 					region: "fra",
 					instanceType: "db.t3.micro",
@@ -90,13 +100,13 @@ class FlyDeplyment extends FlySDK {
 			},
 		});
 
-		const apiMachine = new FlyMachine(Stack, "api-server", {
+		const apiMachine = new FlyMachine(this.stack, "api-server", {
 			name: "api-server",
 			count: 1,
 			regions: ["sfo"],
 			autoScaling: apiAutoScaling,
 			link: [APIdatabase],
-			machineConfig: new FlyMachineConfig(Stack, "api-server-config", {
+			machineConfig: new FlyMachineConfig(this.stack, "api-server-config", {
 				cpus: 1,
 				memoryMB: 512,
 				image: "node:14",
@@ -115,12 +125,12 @@ class FlyDeplyment extends FlySDK {
 			}),
 		});
 
-		const webMachine = new FlyMachine(Stack, "web-server", {
+		const webMachine = new FlyMachine(this.stack, "web-server", {
 			name: "web-server",
 			count: 1,
 			regions: ["sfo"],
 			autoScaling: webAutoScaling,
-			machineConfig: new FlyMachineConfig(Stack, "web-server-config", {
+			machineConfig: new FlyMachineConfig(this.stack, "web-server-config", {
 				cpus: 1,
 				memoryMB: 512,
 				image: "nginx:latest",
@@ -137,7 +147,7 @@ class FlyDeplyment extends FlySDK {
 			}),
 		});
 
-		const tlsConfig = new TlsConfig(Stack, "tls-config", {
+		const tlsConfig = new TlsConfig(this.stack, "tls-config", {
 			enabled: true,
 			certificate: "path/to/cert.pem",
 			privateKey: "path/to/key.pem",
@@ -145,16 +155,20 @@ class FlyDeplyment extends FlySDK {
 			versions: ["TLSv1.2", "TLSv1.3"],
 		});
 
-        const loadBalancingConfig = new LBConfig(Stack, "load-balancing-config", {
-            strategy: "round-robin", 
-            healthCheck: {
-                path: "/health",
-                interval: 30,
-                timeout: 5,
-            },
-        });
+		const loadBalancingConfig = new LBConfig(
+			this.stack,
+			"load-balancing-config",
+			{
+				strategy: "round-robin",
+				healthCheck: {
+					path: "/health",
+					interval: 30,
+					timeout: 5,
+				},
+			},
+		);
 
-		const apiProxy = new FlyProxy(Stack, "api-proxy", {
+		const apiProxy = new FlyProxy(this.stack, "api-proxy", {
 			name: "api-proxy",
 			machines: {
 				api: apiMachine,
@@ -165,7 +179,7 @@ class FlyDeplyment extends FlySDK {
 			loadBalancing: loadBalancingConfig,
 		});
 
-		const webProxy = new FlyProxy(Stack, "web-proxy", {
+		const webProxy = new FlyProxy(this.stack, "web-proxy", {
 			name: "web-proxy",
 			machines: {
 				web: webMachine,
@@ -177,14 +191,14 @@ class FlyDeplyment extends FlySDK {
 			loadBalancing: loadBalancingConfig,
 		});
 
-		const publicWebsite = new AnycastIP(Stack, 'my-new-ip', {
+		const publicWebsite = new AnycastIP(this.stack, "my-new-ip", {
 			type: "v4",
 			shared: true,
 			proxy: webProxy,
 			tls: tlsConfig,
 		});
 
-		const devApp = new FlyApp(Stack, "my-dev-app", {
+		const devApp = new FlyApp(this.stack, "my-dev-app", {
 			name: "my-dev-app",
 			domain: devDomain.domainName,
 			certificate: devDomainCertificate,
@@ -199,8 +213,11 @@ class FlyDeplyment extends FlySDK {
 				api: apiProxy,
 			},
 		});
-
-		DevEnvironemnt.deploy(devApp);
-
 	}
 }
+
+const deployment = new FlyDeplyment({
+	apiToken: "my-api-token",
+});
+
+console.log(deployment.stack);

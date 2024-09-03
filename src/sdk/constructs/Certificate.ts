@@ -6,12 +6,13 @@ export interface IFlyCertificateConfig {
   domains: string;
 }
 
-export class FlyCertificate extends StackConstruct {
+export class Certificate extends StackConstruct {
   private config: IFlyCertificateConfig;
 
   constructor(stack: FlyStack, name: string, config: IFlyCertificateConfig) {
     super(stack, name);
     this.config = config;
+    this.initialize();
   }
 
   synthesize(): Record<string, any> {
