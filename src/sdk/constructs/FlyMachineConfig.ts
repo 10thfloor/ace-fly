@@ -38,4 +38,8 @@ export class FlyMachineConfig extends StackConstruct {
       internalPort: this.config.internalPort
     };
   }
+
+  protected validate(): boolean {
+    return true;
+  }
 }

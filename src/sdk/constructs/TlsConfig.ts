@@ -27,4 +27,8 @@ export class TlsConfig extends StackConstruct {
       versions: this.config.versions
     };
   }
+
+  protected validate(): boolean {
+    return true;
+  }
 }

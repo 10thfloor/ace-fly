@@ -29,4 +29,8 @@ export class FlyProxy extends StackConstruct {
       loadBalancing: this.config.loadBalancing.synthesize()
     };
   }
+
+  protected validate(): boolean {
+    return true;
+  }
 }

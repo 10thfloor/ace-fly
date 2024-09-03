@@ -36,4 +36,8 @@ export class FlyPostgres extends StackConstruct {
       replicas: this.config.replicas.map(replica => replica.synthesize())
     };
   }
+
+  protected validate(): boolean {
+    return true;
+  }
 }

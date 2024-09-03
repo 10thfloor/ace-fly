@@ -1,6 +1,6 @@
 import { FlySDK, type IFlySDKConfig } from "../sdk/core/FlySDK.js";
 import { FlyStack } from "../sdk/core/FlyStack.js";
-import { FlyOrg } from "../sdk/constructs/FlyOrg.js";
+import { FlyOrg } from "../sdk/core/FlyOrg.js";
 import { FlyDomain } from "../sdk/constructs/FlyDomain.js";
 import { FlyCertificate } from "../sdk/constructs/FlyCertificate.js";
 import { FlySecret } from "../sdk/constructs/FlySecret.js";
@@ -22,7 +22,6 @@ class FlyDeplyment extends FlySDK {
 		super(context);
 
 		const Stack = new FlyStack(this, "my-stack");
-
 		const DevEnvironemnt = new FlyOrg(Stack, "dev");
 
 		const devDomain = new FlyDomain(Stack, "my-domain", {

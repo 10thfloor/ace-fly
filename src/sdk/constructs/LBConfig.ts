@@ -26,4 +26,8 @@ export class LBConfig extends StackConstruct {
       healthCheck: this.config.healthCheck
     };
   }
+
+  protected validate(): boolean {
+    return true;
+  }
 }

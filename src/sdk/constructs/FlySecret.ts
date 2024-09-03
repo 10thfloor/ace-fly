@@ -20,4 +20,8 @@ export class FlySecret extends StackConstruct {
       key: this.config.key
     };
   }
+
+  protected validate(): boolean {
+    return true;
+  }
 }

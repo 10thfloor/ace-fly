@@ -28,4 +28,8 @@ export class AnycastIP extends StackConstruct {
       tls: this.config.tls.synthesize()
     };
   }
+
+  protected validate(): boolean {
+    return true;
+  }
 }

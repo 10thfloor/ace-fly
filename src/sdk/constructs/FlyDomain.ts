@@ -1,5 +1,6 @@
 import type { FlyStack } from "../core/FlyStack";
 import { StackConstruct } from "./StackConstruct";
+import { Logger } from "../utils/Logger";
 
 export interface IFlyDomainConfig {
   domainName: string;
@@ -11,7 +12,6 @@ export class FlyDomain extends StackConstruct {
   constructor(stack: FlyStack, name: string, config: IFlyDomainConfig) {
     super(stack, name);
     this.domainName = config.domainName;
-    // Implementation
   }
 
   synthesize(): Record<string, any> {
@@ -20,5 +20,14 @@ export class FlyDomain extends StackConstruct {
       name: this.name,
       domainName: this.domainName
     };
+  }
+
+  protected validate(): boolean {
+    if (!this.domainName || typeof this.domainName !== 'string') {
+      Logger.error(`Invalid domain name for ${this.name}`);
+      return false;
+    }
+    // Add more specific validation rules here
+    return true;
   }
 }

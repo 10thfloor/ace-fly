@@ -26,4 +26,8 @@ export class AutoScalingConfig extends StackConstruct {
       scaleToZero: this.config.scaleToZero
     };
   }
+
+  protected validate(): boolean {
+    return true;
+  }
 }

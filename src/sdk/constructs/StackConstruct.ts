@@ -1,4 +1,5 @@
 import type { FlyStack } from "../core/FlyStack";
+import { Logger } from "../utils/Logger";
 
 export abstract class StackConstruct {
   protected stack: FlyStack;
@@ -7,7 +8,12 @@ export abstract class StackConstruct {
   constructor(stack: FlyStack, name: string) {
     this.stack = stack;
     this.name = name;
-    this.stack.addResource(this);
+    if (this.validate()) {
+      this.stack.addResource(this);
+    } else {
+      Logger.error(`Failed to create invalid resource ${this.name}`);
+      throw new Error(`Invalid configuration for ${this.name}`);
+    }
   }
 
   getName(): string {
@@ -15,4 +21,6 @@ export abstract class StackConstruct {
   }
 
   abstract synthesize(): Record<string, any>;
+
+  protected abstract validate(): boolean;
 }

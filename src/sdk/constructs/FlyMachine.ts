@@ -32,4 +32,8 @@ export class FlyMachine extends StackConstruct {
       link: this.config.link?.map(postgres => postgres.getName())
     };
   }
+
+  protected validate(): boolean {
+    return true;
+  }
 }

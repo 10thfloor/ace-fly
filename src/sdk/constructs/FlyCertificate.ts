@@ -21,4 +21,8 @@ export class FlyCertificate extends StackConstruct {
       domains: this.config.domains
     };
   }
+
+  protected validate(): boolean {
+    return true;
+  }
 }

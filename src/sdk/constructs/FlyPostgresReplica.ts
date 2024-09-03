@@ -28,4 +28,8 @@ export class FlyPostgresReplica extends StackConstruct {
       storage: this.config.storage
     };
   }
+
+  protected validate(): boolean {
+    return true;
+  }
 }

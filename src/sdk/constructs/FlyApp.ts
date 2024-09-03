@@ -43,4 +43,8 @@ export class FlyApp extends StackConstruct {
       }
     };
   }
+
+  protected validate(): boolean {
+    return true;
+  }
 }

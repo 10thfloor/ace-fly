@@ -21,4 +21,8 @@ export class FlyVolume extends StackConstruct {
       size: this.config.size
     };
   }
+
+  protected validate(): boolean {
+    return true;
+  }
 }
