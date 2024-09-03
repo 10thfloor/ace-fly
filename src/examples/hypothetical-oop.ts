@@ -1,25 +1,25 @@
-import { FlySDK, type IFlySDKConfig } from "../sdk/constructsV3/FlySDK.js";
-import { FlyStack } from "../sdk/constructsV3/FlyStack.js";
-import { FlyOrg } from "../sdk/constructsV3/FlyOrg.js";
-import { FlyDomain } from "../sdk/constructsV3/FlyDomain.js";
-import { FlyCertificate } from "../sdk/constructsV3/FlyCertificate.js";
-import { FlySecret } from "../sdk/constructsV3/FlySecret.js";
-import { FlyVolume } from "../sdk/constructsV3/FlyVolume.js";
-import { FlyPostgres } from "../sdk/constructsV3/FlyPostgres.js";
-import { FlyPostgresReplica } from "../sdk/constructsV3/FlyPostgresReplica.js";
-import { AutoScalingConfig } from "../sdk/constructsV3/AutoScalingConfig.js";
-import { TlsConfig } from "../sdk/constructsV3/TlsConfig.js";
-import { LBConfig } from "../sdk/constructsV3/LBConfig.js";
-import { FlyMachine } from "../sdk/constructsV3/FlyMachine.js";
-import { FlyMachineConfig } from "../sdk/constructsV3/FlyMachineConfig.js";
-import { FlyProxy } from "../sdk/constructsV3/FlyProxy.js";
-import { AnycastIP } from "../sdk/constructsV3/AnycastIP.js";
-import { FlyApp } from "../sdk/constructsV3/FlyApp.js";
+import { FlySDK, type IFlySDKConfig } from "../sdk/core/FlySDK.js";
+import { FlyStack } from "../sdk/core/FlyStack.js";
+import { FlyOrg } from "../sdk/constructs/FlyOrg.js";
+import { FlyDomain } from "../sdk/constructs/FlyDomain.js";
+import { FlyCertificate } from "../sdk/constructs/FlyCertificate.js";
+import { FlySecret } from "../sdk/constructs/FlySecret.js";
+import { FlyVolume } from "../sdk/constructs/FlyVolume.js";
+import { FlyPostgres } from "../sdk/constructs/FlyPostgres.js";
+import { FlyPostgresReplica } from "../sdk/constructs/FlyPostgresReplica.js";
+import { AutoScalingConfig } from "../sdk/constructs/AutoScalingConfig.js";
+import { TlsConfig } from "../sdk/constructs/TlsConfig.js";
+import { LBConfig } from "../sdk/constructs/LBConfig.js";
+import { FlyMachine } from "../sdk/constructs/FlyMachine.js";
+import { FlyMachineConfig } from "../sdk/constructs/FlyMachineConfig.js";
+import { FlyProxy } from "../sdk/constructs/FlyProxy.js";
+import { AnycastIP } from "../sdk/constructs/AnycastIP.js";
+import { FlyApp } from "../sdk/constructs/FlyApp.js";
 
 
 class FlyDeplyment extends FlySDK {
 	constructor(context: IFlySDKConfig) {
-		super("MyInfrastructure", context);
+		super(context);
 
 		const Stack = new FlyStack(this, "my-stack");
 
@@ -52,21 +52,21 @@ class FlyDeplyment extends FlySDK {
 			size: "100GB",
 		});
 
-		const apiAutoScaling = new AutoScalingConfig(Stack, {
+		const apiAutoScaling = new AutoScalingConfig(Stack, "api-auto-scaling", {
 			minMachines: 1,
 			maxMachines: 5,
 			targetCPUUtilization: 70,
 			scaleToZero: true, 
 		});
 
-		const webAutoScaling = new AutoScalingConfig(Stack, {
+		const webAutoScaling = new AutoScalingConfig(Stack, "web-auto-scaling", {
 			minMachines: 1,
 			maxMachines: 5,
 			targetCPUUtilization: 70,
 			scaleToZero: true, 
 		});
 
-		const APIdatabase = new FlyPostgres(Stack, {
+		const APIdatabase = new FlyPostgres(Stack, "api-database", {
 			name: "my-database",
 			region: "sfo",
 			credentials: {
@@ -74,7 +74,7 @@ class FlyDeplyment extends FlySDK {
 				password: dbPassword,
 			},
 			replicas: [
-				new FlyPostgresReplica(Stack, {
+				new FlyPostgresReplica(Stack, "api-database-replica", {
 					name: "my-database-replica",
 					region: "fra",
 					instanceType: "db.t3.micro",
@@ -91,13 +91,13 @@ class FlyDeplyment extends FlySDK {
 			},
 		});
 
-		const apiMachine = new FlyMachine(Stack, {
+		const apiMachine = new FlyMachine(Stack, "api-server", {
 			name: "api-server",
 			count: 1,
 			regions: ["sfo"],
 			autoScaling: apiAutoScaling,
 			link: [APIdatabase],
-			machineConfig: new FlyMachineConfig(Stack, {
+			machineConfig: new FlyMachineConfig(Stack, "api-server-config", {
 				cpus: 1,
 				memoryMB: 512,
 				image: "node:14",
@@ -116,12 +116,12 @@ class FlyDeplyment extends FlySDK {
 			}),
 		});
 
-		const webMachine = new FlyMachine(Stack, {
+		const webMachine = new FlyMachine(Stack, "web-server", {
 			name: "web-server",
 			count: 1,
 			regions: ["sfo"],
 			autoScaling: webAutoScaling,
-			machineConfig: new FlyMachineConfig(Stack, {
+			machineConfig: new FlyMachineConfig(Stack, "web-server-config", {
 				cpus: 1,
 				memoryMB: 512,
 				image: "nginx:latest",
@@ -138,7 +138,7 @@ class FlyDeplyment extends FlySDK {
 			}),
 		});
 
-		const tlsConfig = new TlsConfig(Stack, {
+		const tlsConfig = new TlsConfig(Stack, "tls-config", {
 			enabled: true,
 			certificate: "path/to/cert.pem",
 			privateKey: "path/to/key.pem",
@@ -146,7 +146,7 @@ class FlyDeplyment extends FlySDK {
 			versions: ["TLSv1.2", "TLSv1.3"],
 		});
 
-        const loadBalancingConfig = new LBConfig(Stack, {
+        const loadBalancingConfig = new LBConfig(Stack, "load-balancing-config", {
             strategy: "round-robin", 
             healthCheck: {
                 path: "/health",
@@ -155,7 +155,7 @@ class FlyDeplyment extends FlySDK {
             },
         });
 
-		const apiProxy = new FlyProxy(Stack, {
+		const apiProxy = new FlyProxy(Stack, "api-proxy", {
 			name: "api-proxy",
 			machines: {
 				api: apiMachine,
@@ -166,7 +166,7 @@ class FlyDeplyment extends FlySDK {
 			loadBalancing: loadBalancingConfig,
 		});
 
-		const webProxy = new FlyProxy(Stack, {
+		const webProxy = new FlyProxy(Stack, "web-proxy", {
 			name: "web-proxy",
 			machines: {
 				web: webMachine,
@@ -178,14 +178,14 @@ class FlyDeplyment extends FlySDK {
 			loadBalancing: loadBalancingConfig,
 		});
 
-		const publicWebsite = new AnycastIP(Stack, {
+		const publicWebsite = new AnycastIP(Stack, 'my-new-ip', {
 			type: "v4",
 			shared: true,
 			proxy: webProxy,
 			tls: tlsConfig,
 		});
 
-		const devApp = new FlyApp(Stack, {
+		const devApp = new FlyApp(Stack, "my-dev-app", {
 			name: "my-dev-app",
 			domain: devDomain.domainName,
 			certificate: devDomainCertificate,
