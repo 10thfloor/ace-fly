@@ -15,16 +15,14 @@ import { FlyMachineConfig } from "../sdk/constructs/FlyMachineConfig.js";
 import { FlyProxy } from "../sdk/constructs/FlyProxy.js";
 import { AnycastIP } from "../sdk/constructs/AnycastIP.js";
 import { FlyApp } from "../sdk/constructs/FlyApp.js";
-
-class FlyDeplyment extends FlySDK {
+import "reflect-metadata";
+class FlyDeployment extends FlySDK {
 	readonly stack: FlyStack;
 
 	constructor(context: IFlySDKConfig) {
 		super(context);
 
 		this.stack = new FlyStack(this, "my-stack");
-
-		const DevEnvironemnt = new FlyOrg(this.stack, "dev");
 
 		const devDomain = new Domain(this.stack, "my-domain", {
 			domainName: "my-app.dev.fly.dev",
@@ -186,7 +184,7 @@ class FlyDeplyment extends FlySDK {
 			},
 			ports: {
 				80: "{{ .web.internalPort }}",
-				443: "{{ .web.internalPort }}",
+					443: "{{ .web.internalPort }}",
 			},
 			loadBalancing: loadBalancingConfig,
 		});
@@ -213,11 +211,14 @@ class FlyDeplyment extends FlySDK {
 				api: apiProxy,
 			},
 		});
+
+		// Log the dependency graph (optional, for debugging)
+		// console.log("DEPS", this.stack.logDependencyGraph());
 	}
 }
 
-const deployment = new FlyDeplyment({
+const deployment = new FlyDeployment({
 	apiToken: "my-api-token",
 });
 
-console.log(deployment.stack);
+console.log(JSON.stringify(deployment.stack.synthesize(), null, 2));

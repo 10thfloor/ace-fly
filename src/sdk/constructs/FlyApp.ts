@@ -1,9 +1,10 @@
+import { StackConstruct } from "./StackConstruct";
+import { Dependency } from "../utils/DependencyDecorator";
 import type { FlyStack } from "../core/FlyStack";
 import type { Certificate } from "./Certificate";
 import type { FlySecret } from "./FlySecret";
 import type { AnycastIP } from "./AnycastIP";
 import type { FlyProxy } from "./FlyProxy";
-import { StackConstruct } from "./StackConstruct";
 
 export interface IFlyAppConfig {
   name: string;
@@ -20,12 +21,32 @@ export interface IFlyAppConfig {
 }
 
 export class FlyApp extends StackConstruct {
+  
+  @Dependency()
+  private certificate: Certificate;
+
+  @Dependency()
+  private secrets: FlySecret[];
+
+  @Dependency()
+  private publicServices: {
+    website: AnycastIP;
+  };
+
+  @Dependency()
+  private privateServices: {
+    api: FlyProxy;
+  };
+
   private config: IFlyAppConfig;
 
   constructor(stack: FlyStack, name: string, config: IFlyAppConfig) {
     super(stack, name);
     this.config = config;
-    this.initialize();
+    this.certificate = config.certificate;
+    this.secrets = config.secrets;
+    this.publicServices = config.publicServices;
+    this.privateServices = config.privateServices;
   }
 
   synthesize(): Record<string, any> {
@@ -47,5 +68,9 @@ export class FlyApp extends StackConstruct {
 
   protected validate(): boolean {
     return true;
+  }
+
+  protected requiredDependencies(): string[] {
+    return ['Domain', 'Certificate', 'FlySecret', 'AnycastIP', 'FlyProxy'];
   }
 }

@@ -7,7 +7,9 @@ export class ConfigurationSynthesizer {
       resources: {},
     };
 
-    for (const resource of stack.getOrderedResources()) {
+    const orderedResources = stack.getDependencyGraph().getOrderedResources();
+
+    for (const resource of orderedResources) {
       const resourceConfig = resource.synthesize();
       config.resources[resource.getName()] = resourceConfig;
     }
