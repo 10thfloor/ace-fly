@@ -82,4 +82,40 @@ export class DependencyGraph {
 
 		return missingDependencies;
 	}
+
+	findCycles(): StackConstruct[][] {
+		const visited = new Set<StackConstruct>();
+		const recursionStack = new Set<StackConstruct>();
+		const cycles: StackConstruct[][] = [];
+	
+		const dfs = (node: StackConstruct, path: StackConstruct[] = []) => {
+		  if (recursionStack.has(node)) {
+			const cycleStart = path.indexOf(node);
+			cycles.push(path.slice(cycleStart));
+			return;
+		  }
+	
+		  if (visited.has(node)) return;
+	
+		  visited.add(node);
+		  recursionStack.add(node);
+		  path.push(node);
+	
+		  const dependencies = this.nodes.get(node)?.dependencies || [];
+		  for (const dep of dependencies) {
+			dfs(dep.resource, [...path]);
+		  }
+	
+		  recursionStack.delete(node);
+		  path.pop();
+		};
+	
+		for (const node of this.nodes.keys()) {
+		  if (!visited.has(node)) {
+			dfs(node);
+		  }
+		}
+	
+		return cycles;
+	  }
 }

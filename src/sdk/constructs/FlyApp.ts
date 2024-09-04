@@ -5,18 +5,20 @@ import type { Certificate } from "./Certificate";
 import type { FlySecret } from "./FlySecret";
 import type { AnycastIP } from "./AnycastIP";
 import type { FlyProxy } from "./FlyProxy";
+import type { FlyMachine } from "./FlyMachine";
+import { ResourceReference } from "../utils/ResourceReference";
 
 export interface IFlyAppConfig {
   name: string;
   domain: string;
-  certificate: Certificate;
-  secrets: FlySecret[];
+  certificate: ResourceReference<Certificate>;
+  secrets: ResourceReference<FlySecret>[];
   env: Record<string, string>;
   publicServices: {
-    website: AnycastIP;
+    [name: string]: ResourceReference<AnycastIP>;
   };
   privateServices: {
-    api: FlyProxy;
+    [name: string]: ResourceReference<FlyProxy>;
   };
 }
 
@@ -30,12 +32,12 @@ export class FlyApp extends StackConstruct {
 
   @Dependency()
   private publicServices: {
-    website: AnycastIP;
+    [name: string]: AnycastIP;
   };
 
   @Dependency()
   private privateServices: {
-    api: FlyProxy;
+    [name: string]: FlyProxy;
   };
 
   private config: IFlyAppConfig;
@@ -43,10 +45,14 @@ export class FlyApp extends StackConstruct {
   constructor(stack: FlyStack, name: string, config: IFlyAppConfig) {
     super(stack, name);
     this.config = config;
-    this.certificate = config.certificate;
-    this.secrets = config.secrets;
-    this.publicServices = config.publicServices;
-    this.privateServices = config.privateServices;
+    this.certificate = config.certificate.getResource();
+    this.secrets = config.secrets.map(ref => ref.getResource());
+    this.publicServices = Object.fromEntries(
+      Object.entries(config.publicServices).map(([key, ref]) => [key, ref.getResource()])
+    );
+    this.privateServices = Object.fromEntries(
+      Object.entries(config.privateServices).map(([key, ref]) => [key, ref.getResource()])
+    );
   }
 
   synthesize(): Record<string, any> {

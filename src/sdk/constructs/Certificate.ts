@@ -3,7 +3,7 @@ import { StackConstruct } from "./StackConstruct";
 
 export interface IFlyCertificateConfig {
   name: string;
-  domains: string;
+  domains: string[];
 }
 
 export class Certificate extends StackConstruct {

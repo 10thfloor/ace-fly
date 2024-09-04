@@ -1,6 +1,7 @@
 import type { FlyStack } from "../core/FlyStack";
 import { Logger } from "../utils/Logger";
 import "reflect-metadata";
+import { ResourceReference } from "../utils/ResourceReference";
 
 export abstract class StackConstruct {
   protected stack: FlyStack;
@@ -9,16 +10,16 @@ export abstract class StackConstruct {
   constructor(stack: FlyStack, name: string) {
     this.stack = stack;
     this.name = name;
+    this.initialize(); // Automatically call initialize
   }
 
   initialize(): void {
-    if (this.validate()) {
       this.stack.addResource(this);
       this.addDependenciesToStack();
-    } else {
-      Logger.error(`Failed to create invalid resource ${this.name}`);
-      throw new Error(`Invalid configuration for ${this.name}`);
-    }
+  }
+
+  public isValid(): boolean {
+    return this.validate();
   }
 
   private addDependenciesToStack(): void {
@@ -50,4 +51,8 @@ export abstract class StackConstruct {
   abstract synthesize(): Record<string, any>;
 
   protected abstract validate(): boolean;
+
+  getReference(): ResourceReference<this> {
+    return new ResourceReference(this);
+  }
 }

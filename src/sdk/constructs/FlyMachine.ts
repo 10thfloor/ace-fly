@@ -51,11 +51,8 @@ export class FlyMachine extends StackConstruct {
     return true;
   }
 
-  protected requiredDependencies(): string[] {
-    return ['AutoScalingConfig', 'FlyMachineConfig'];
-  }
 
-  protected optionalDependencies(): string[] {
-    return ['FlyPostgres'];
+  linkDatabase(database: FlyPostgres): void {
+    this.link = [database];
   }
 }
