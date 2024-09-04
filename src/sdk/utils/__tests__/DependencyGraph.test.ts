@@ -5,6 +5,7 @@ import { FlyStack } from '../../core/FlyStack';
 import 'reflect-metadata';
 
 // Import expect from bun:test
+// @ts-ignore
 import { expect, it, describe } from 'bun:test';
 
 class TestResource extends StackConstruct {
