@@ -2,7 +2,7 @@ import type { FlyStack } from "../core/FlyStack";
 import type { FlyVolume } from "./FlyVolume";
 import { StackConstruct } from "./StackConstruct";
 
-export interface IFlyMachineConfig {
+export interface IFlyMachineConfigConfig {
   name?: string;
   cpus: number;
   memoryMB: number;
@@ -18,9 +18,9 @@ export interface IFlyMachineConfig {
 }
 
 export class FlyMachineConfig extends StackConstruct {
-  private config: IFlyMachineConfig;
+  private config: IFlyMachineConfigConfig;
 
-  constructor(stack: FlyStack, id: string, config: IFlyMachineConfig) {
+  constructor(stack: FlyStack, id: string, config: IFlyMachineConfigConfig) {
     super(stack, id);
     this.config = config;
     this.initialize();

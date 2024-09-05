@@ -8,6 +8,9 @@ import { LBConfig } from "../../constructs/LBConfig";
 import { FlyMachineConfig } from "../../constructs/FlyMachineConfig";
 import { FlyMachine } from "../../constructs/FlyMachine";
 import { AutoScalingConfig } from "../../constructs/AutoScalingConfig";
+
+// @ts-expect-error: bun:test is not install it's local via `bun test` command
+// This is just here to make the type errors go away.
 import { expect, describe, it, beforeEach } from "bun:test";
 
 describe("ConfigurationSynthesizer", () => {
