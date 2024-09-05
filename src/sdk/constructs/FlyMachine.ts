@@ -44,7 +44,7 @@ export class FlyMachine extends StackConstruct {
       count: this.config.count,
       regions: this.config.regions,
       autoScaling: this.autoScaling.getId(),
-      link: this.link?.map(db => db.getId()),
+      link: this.link?.map(db => db.getId()) || [],
       machineConfig: this.machineConfig.getId()
     };
   }

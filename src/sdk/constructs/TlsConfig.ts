@@ -26,7 +26,8 @@ export class TlsConfig extends StackConstruct {
       enabled: this.config.enabled,
       certificate: this.config.certificate,
       alpn: this.config.alpn,
-      versions: this.config.versions
+      versions: this.config.versions,
+      privateKey: this.config.privateKey
     };
   }
 
