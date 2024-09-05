@@ -14,12 +14,12 @@ class TestResource extends StackConstruct {
   }
 
   get resourceName(): string {
-    return this.name;
+    return this.getId();
   }
 
   synthesize(): Record<string, any> {
     return {
-      name: this.name
+      name: this.getId()
     };
   }
 
@@ -42,7 +42,7 @@ class ResourceWithDependency extends StackConstruct {
 
   synthesize(): Record<string, any> {
     return {
-      name: this.name,
+      name: this.getId(),
       dependency: this.dependency?.resourceName
     };
   }

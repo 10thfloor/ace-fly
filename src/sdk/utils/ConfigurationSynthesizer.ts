@@ -43,8 +43,7 @@ export class ConfigurationSynthesizer {
     if (typeof obj === 'object' && obj !== null) {
       const resolved: Record<string, any> = {};
       for (const [key, value] of Object.entries(obj)) {
-        if (value && typeof value === 'object' && 'id' in value && this.processedResources.has(value.id)) {
-          // If the value is a processed resource, replace it with its ID
+        if (value && typeof value === 'object' && 'id' in value && this.processedResources.has(value.id as string)) {
           resolved[key] = value.id;
         } else {
           resolved[key] = this.resolveReferences(value);
