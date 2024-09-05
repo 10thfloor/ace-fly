@@ -2,6 +2,7 @@ import type { FlyStack } from "../core/FlyStack";
 import { StackConstruct } from "./StackConstruct";
 
 export interface IAutoScalingConfig {
+  name?: string;
   minMachines: number;
   maxMachines: number;
   targetCPUUtilization: number;
@@ -9,10 +10,10 @@ export interface IAutoScalingConfig {
 }
 
 export class AutoScalingConfig extends StackConstruct {
-  private config: IAutoScalingConfig;
+  config: IAutoScalingConfig;
 
-  constructor(stack: FlyStack, name: string, config: IAutoScalingConfig) {
-    super(stack, name);
+  constructor(stack: FlyStack, id: string, config: IAutoScalingConfig) {
+    super(stack, id);
     this.config = config;
     this.initialize();
   }
@@ -20,7 +21,7 @@ export class AutoScalingConfig extends StackConstruct {
   synthesize(): Record<string, any> {
     return {
       type: 'auto-scaling',
-      name: this.name,
+      name: this.config.name || this.getId(),
       minMachines: this.config.minMachines,
       maxMachines: this.config.maxMachines,
       targetCPUUtilization: this.config.targetCPUUtilization,

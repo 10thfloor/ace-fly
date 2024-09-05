@@ -3,6 +3,7 @@ import type { FlyVolume } from "./FlyVolume";
 import { StackConstruct } from "./StackConstruct";
 
 export interface IFlyMachineConfig {
+  name?: string;
   cpus: number;
   memoryMB: number;
   image: string;
@@ -19,8 +20,8 @@ export interface IFlyMachineConfig {
 export class FlyMachineConfig extends StackConstruct {
   private config: IFlyMachineConfig;
 
-  constructor(stack: FlyStack, name: string, config: IFlyMachineConfig) {
-    super(stack, name);
+  constructor(stack: FlyStack, id: string, config: IFlyMachineConfig) {
+    super(stack, id);
     this.config = config;
     this.initialize();
   }
@@ -28,14 +29,14 @@ export class FlyMachineConfig extends StackConstruct {
   synthesize(): Record<string, any> {
     return {
       type: 'machine-config',
-      name: this.name,
+      name: this.config.name || this.getId(),
       cpus: this.config.cpus,
       memoryMB: this.config.memoryMB,
       image: this.config.image,
       cmd: this.config.cmd,
       env: this.config.env,
       guest: this.config.guest,
-      volumes: this.config.volumes.map(volume => volume.getName()),
+      volumes: this.config.volumes.map(volume => volume.getId()),
       internalPort: this.config.internalPort
     };
   }

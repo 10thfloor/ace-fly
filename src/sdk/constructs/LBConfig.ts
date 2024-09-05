@@ -2,6 +2,7 @@ import type { FlyStack } from "../core/FlyStack";
 import { StackConstruct } from "./StackConstruct";
 
 export interface ILBConfig {
+  name?: string;
   strategy: string;
   healthCheck: {
     path: string;
@@ -13,8 +14,8 @@ export interface ILBConfig {
 export class LBConfig extends StackConstruct {
   private config: ILBConfig;
 
-  constructor(stack: FlyStack, name: string, config: ILBConfig) {
-    super(stack, name);
+  constructor(stack: FlyStack, id: string, config: ILBConfig) {
+    super(stack, id);
     this.config = config;
     this.initialize();
   }
@@ -22,7 +23,7 @@ export class LBConfig extends StackConstruct {
   synthesize(): Record<string, any> {
     return {
       type: 'lb-config',
-      name: this.name,
+      name: this.config.name || this.getId(),
       strategy: this.config.strategy,
       healthCheck: this.config.healthCheck
     };

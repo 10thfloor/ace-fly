@@ -1,8 +1,6 @@
 import { FlyStack } from "../core/FlyStack";
 import { StackConstruct } from "../constructs/StackConstruct";
 import { Logger } from "./Logger";
-import { FlyApp } from "../constructs/FlyApp";
-import { FlyMachine } from "../constructs/FlyMachine";
 
 export class StackValidator {
   private stack: FlyStack;
@@ -16,16 +14,10 @@ export class StackValidator {
     this.errors = [];
     const resources = this.stack.getResources();
 
-    // Validate individual resources
     resources.forEach(resource => this.validateResource(resource));
-
-    // Validate stack-level constraints
     this.validateStackConstraints();
-
-    // Check for circular dependencies
     this.validateNoCyclicDependencies();
 
-    // Log errors if any
     if (this.errors.length > 0) {
       this.errors.forEach(error => Logger.error(error));
       return false;
@@ -35,13 +27,13 @@ export class StackValidator {
   }
 
   private validateResource(resource: StackConstruct): void {
-    if (!resource.isValid()) {  // Use the new public method
-      this.errors.push(`Invalid configuration for resource: ${resource.getName()}`);
+    if (!resource.isValid()) {
+      this.errors.push(`Invalid configuration for resource: ${resource.getId()}`);
     }
   }
 
   private validateStackConstraints(): void {
-   // TODO: Add more stack-level validations here
+    // Add more stack-level validations here
   }
 
   private validateNoCyclicDependencies(): void {
@@ -49,7 +41,7 @@ export class StackValidator {
     const cycles = graph.findCycles();
     if (cycles.length > 0) {
       cycles.forEach(cycle => {
-        this.errors.push(`Circular dependency detected: ${cycle.map(node => node.getName()).join(' -> ')}`);
+        this.errors.push(`Circular dependency detected: ${cycle.map(node => node.getId()).join(' -> ')}`);
       });
     }
   }

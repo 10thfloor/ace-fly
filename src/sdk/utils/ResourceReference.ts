@@ -7,8 +7,8 @@ export class ResourceReference<T extends StackConstruct> {
     this.resource = resource;
   }
 
-  getName(): string {
-    return this.resource.getName();
+  getId(): string {
+    return this.resource.getId();
   }
 
   getType(): string {
@@ -20,6 +20,6 @@ export class ResourceReference<T extends StackConstruct> {
   }
 
   toString(): string {
-    return `${this.getType()}:${this.getName()}`;
+    return `${this.getType()}:${this.getId()}`;
   }
 }

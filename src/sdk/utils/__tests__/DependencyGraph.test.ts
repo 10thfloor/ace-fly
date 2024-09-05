@@ -66,9 +66,7 @@ describe("DependencyGraph Tests", () => {
     graph.addResource(resourceWithMissingDep);
   
     const missingDependencies = graph.getMissingDependencies();
-  
-    console.log("Missing Dependencies:", missingDependencies);
-  
+    
     expect(missingDependencies.size).toBe(1);
     expect(missingDependencies.get(resourceWithMissingDep)).toEqual(['dependency']);
   });
@@ -89,8 +87,6 @@ describe("DependencyGraph Tests", () => {
     graph.addDependency(resourceWithDep, resource2);
   
     const missingDependencies = graph.getMissingDependencies();
-  
-    console.log("Missing Dependencies:", missingDependencies);
   
     expect(missingDependencies.size).toBe(0);
   });

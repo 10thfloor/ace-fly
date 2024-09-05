@@ -1,11 +1,14 @@
 import type { FlyStack } from "../core/FlyStack";
 import { ResourceReference } from "../utils/ResourceReference";
 import { StackConstruct } from "../constructs/StackConstruct";
+import { Logger } from "../utils/Logger";
 
 export class ConfigurationSynthesizer {
-  private flatConfig: Record<string, any> = {};
+  private processedResources: Map<string, any> = new Map();
 
   synthesize(stack: FlyStack): Record<string, any> {
+    this.processedResources.clear();
+
     const config: Record<string, any> = {
       app: stack.getName(),
       resources: {},
@@ -13,48 +16,43 @@ export class ConfigurationSynthesizer {
 
     const orderedResources = stack.getDependencyGraph().getOrderedResources();
 
-    // First pass: Add all resources to the flat configuration
+    // First pass: Synthesize all resources
     for (const resource of orderedResources) {
+      Logger.info(`Synthesizing resource: ${resource.getId()}`);
       const resourceConfig = resource.synthesize();
-      this.addResourceToFlatConfig(resourceConfig);
+      this.processedResources.set(resource.getId(), resourceConfig);
     }
 
-    // Second pass: Replace nested resources with their names
-    for (const resourceName in this.flatConfig) {
-      this.replaceNestedResourcesWithNames(this.flatConfig[resourceName]);
+    // Second pass: Resolve references and add to final config
+    for (const [id, resourceConfig] of this.processedResources) {
+      config.resources[id] = this.resolveReferences(resourceConfig);
     }
 
-    config.resources = this.flatConfig;
     return config;
   }
 
-  private addResourceToFlatConfig(resourceConfig: Record<string, any>): void {
-    const { name } = resourceConfig;
-    if (name && !this.flatConfig[name]) {
-      this.flatConfig[name] = resourceConfig;
+  private resolveReferences(obj: any): any {
+    if (obj instanceof ResourceReference || obj instanceof StackConstruct) {
+      return obj.getId();
     }
-  }
 
-  private replaceNestedResourcesWithNames(resourceConfig: Record<string, any>): void {
-    for (const key in resourceConfig) {
-      if (resourceConfig[key] instanceof ResourceReference) {
-        resourceConfig[key] = resourceConfig[key].getName();
-      } else if (Array.isArray(resourceConfig[key])) {
-        resourceConfig[key] = resourceConfig[key].map((item: any) => {
-          if (item instanceof ResourceReference) {
-            return item.getName();
-          } else if (typeof item === 'object' && item !== null && item.name && this.flatConfig[item.name]) {
-            return item.name;
-          }
-          return item;
-        });
-      } else if (typeof resourceConfig[key] === 'object' && resourceConfig[key] !== null) {
-        if (resourceConfig[key].name && this.flatConfig[resourceConfig[key].name]) {
-          resourceConfig[key] = resourceConfig[key].name;
+    if (Array.isArray(obj)) {
+      return obj.map(item => this.resolveReferences(item));
+    }
+
+    if (typeof obj === 'object' && obj !== null) {
+      const resolved: Record<string, any> = {};
+      for (const [key, value] of Object.entries(obj)) {
+        if (value && typeof value === 'object' && 'id' in value && this.processedResources.has(value.id)) {
+          // If the value is a processed resource, replace it with its ID
+          resolved[key] = value.id;
         } else {
-          this.replaceNestedResourcesWithNames(resourceConfig[key]);
+          resolved[key] = this.resolveReferences(value);
         }
       }
+      return resolved;
     }
+
+    return obj;
   }
 }

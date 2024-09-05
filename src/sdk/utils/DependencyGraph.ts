@@ -1,10 +1,8 @@
 import { StackConstruct } from "../constructs/StackConstruct";
-import { Logger } from "../utils/Logger";
-
+import { Logger } from "./Logger";
 export interface DependencyNode {
 	resource: StackConstruct;
 	dependencies: DependencyNode[];
-	cyclicDependencies?: string[];
 }
 
 export class DependencyGraph {
@@ -47,17 +45,13 @@ export class DependencyGraph {
 			result.push(node.resource);
 		};
 
-		// Visit all nodes
 		for (const root of this.rootNodes) {
 			visit(this.nodes.get(root)!);
 		}
+		
+		Logger.info(`Ordered resources: ${result.map(r => r.getId()).join(', ')}`);
 
 		return result;
-	}
-
-	getDependencies(resource: StackConstruct): StackConstruct[] {
-		const node = this.nodes.get(resource);
-		return node ? node.dependencies.map((dep) => dep.resource) : [];
 	}
 
 	getMissingDependencies(): Map<StackConstruct, string[]> {

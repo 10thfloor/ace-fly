@@ -8,9 +8,9 @@ export class FlyStack {
   private name: string;
   private resources: StackConstruct[] = [];
   private dependencyGraph: DependencyGraph = new DependencyGraph();
-  private validator: StackValidator;
   private synthesizer: ConfigurationSynthesizer = new ConfigurationSynthesizer();
-
+  private validator: StackValidator;
+ 
   constructor(name: string) {
     this.name = name;
     this.validator = new StackValidator(this);
@@ -19,7 +19,6 @@ export class FlyStack {
   addResource(resource: StackConstruct): void {
     this.resources.push(resource);
     this.dependencyGraph.addResource(resource);
-    Logger.info(`Added resource ${resource.getName()} to stack ${this.name}`);
   }
 
   addDependency(dependent: StackConstruct, dependency: StackConstruct): void {

@@ -2,7 +2,7 @@ import type { FlyStack } from "../core/FlyStack";
 import { StackConstruct } from "./StackConstruct";
 
 export interface IFlyPostgresReplicaConfig {
-  name: string;
+  name?: string;
   region: string;
   instanceType: string;
   storage: {
@@ -23,7 +23,7 @@ export class FlyPostgresReplica extends StackConstruct {
   synthesize(): Record<string, any> {
     return {
       type: 'postgres-replica',
-      name: this.name,
+      name: this.config.name || this.getId(),
       region: this.config.region,
       instanceType: this.config.instanceType,
       storage: this.config.storage

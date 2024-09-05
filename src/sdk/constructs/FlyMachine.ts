@@ -4,21 +4,23 @@ import type { FlyStack } from "../core/FlyStack";
 import type { AutoScalingConfig } from "./AutoScalingConfig";
 import type { FlyMachineConfig } from "./FlyMachineConfig";
 import type { FlyPostgres } from "./FlyPostgres";
+import type { ResourceOrReference } from "../../types";
 
 export interface IFlyMachineConfig {
-  name: string;
+  name?: string;
   count: number;
   regions: string[];
-  autoScaling: AutoScalingConfig;
-  link?: FlyPostgres[];
-  machineConfig: FlyMachineConfig;
+  autoScaling: ResourceOrReference<AutoScalingConfig>;
+  link?: ResourceOrReference<FlyPostgres>[];
+  machineConfig: ResourceOrReference<FlyMachineConfig>;
 }
 
 export class FlyMachine extends StackConstruct {
+  
   @Dependency()
   private autoScaling: AutoScalingConfig;
 
-  @Dependency(true) // Optional dependency
+  @Dependency(true)
   private link?: FlyPostgres[];
 
   @Dependency()
@@ -26,23 +28,24 @@ export class FlyMachine extends StackConstruct {
 
   private config: IFlyMachineConfig;
 
-  constructor(stack: FlyStack, name: string, config: IFlyMachineConfig) {
-    super(stack, name);
+  constructor(stack: FlyStack, id: string, config: IFlyMachineConfig) {
+    super(stack, id);
     this.config = config;
-    this.autoScaling = config.autoScaling;
-    this.link = config.link;
-    this.machineConfig = config.machineConfig;
+    this.autoScaling = this.getResource(config.autoScaling);
+    this.link = config.link?.map(db => this.getResource(db));
+    this.machineConfig = this.getResource(config.machineConfig);
+    this.initialize();
   }
 
   synthesize(): Record<string, any> {
     return {
       type: 'machine',
-      name: this.name,
+      name: this.config.name || this.getId(),
       count: this.config.count,
       regions: this.config.regions,
-      autoScaling: this.autoScaling.synthesize(),
-      link: this.link?.map(db => db.getName()),
-      machineConfig: this.machineConfig.synthesize()
+      autoScaling: this.autoScaling.getId(),
+      link: this.link?.map(db => db.getId()),
+      machineConfig: this.machineConfig.getId()
     };
   }
 
@@ -52,7 +55,7 @@ export class FlyMachine extends StackConstruct {
   }
 
 
-  linkDatabase(database: FlyPostgres): void {
-    this.link = [database];
+  linkDatabase(database: ResourceOrReference<FlyPostgres>): void {
+    this.link = [this.getResource(database)];
   }
 }
