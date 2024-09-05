@@ -18,15 +18,15 @@ export class Certificate extends StackConstruct {
   constructor(stack: FlyStack, id: string, config: ICertificateConfig) {
     super(stack, id);
     this.config = config;
-    this.domains = config.domains.map(domain => this.getResource(domain));
+    this.domains = config.domains.map((domain) => this.getResource(domain));
     this.initialize();
   }
 
   synthesize(): Record<string, any> {
     return {
-      type: 'certificate',
+      type: "certificate",
       name: this.config.name || this.getId(),
-      domains: this.domains.map(domain => domain.getDomainName())
+      domains: this.domains.map((domain) => domain.getDomainName()),
     };
   }
 

@@ -28,7 +28,7 @@ export class FlyMachineConfig extends StackConstruct {
 
   synthesize(): Record<string, any> {
     return {
-      type: 'machine-config',
+      type: "machine-config",
       name: this.config.name || this.getId(),
       cpus: this.config.cpus,
       memoryMB: this.config.memoryMB,
@@ -36,8 +36,8 @@ export class FlyMachineConfig extends StackConstruct {
       cmd: this.config.cmd,
       env: this.config.env,
       guest: this.config.guest,
-      volumes: this.config.volumes.map(volume => volume.getId()),
-      internalPort: this.config.internalPort
+      volumes: this.config.volumes.map((volume) => volume.getId()),
+      internalPort: this.config.internalPort,
     };
   }
 

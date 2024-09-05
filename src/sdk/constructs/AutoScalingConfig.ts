@@ -20,12 +20,12 @@ export class AutoScalingConfig extends StackConstruct {
 
   synthesize(): Record<string, any> {
     return {
-      type: 'auto-scaling-config',
+      type: "auto-scaling-config",
       name: this.config.name || this.getId(),
       minMachines: this.config.minMachines,
       maxMachines: this.config.maxMachines,
       targetCPUUtilization: this.config.targetCPUUtilization,
-      scaleToZero: this.config.scaleToZero
+      scaleToZero: this.config.scaleToZero,
     };
   }
 

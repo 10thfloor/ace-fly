@@ -1,9 +1,9 @@
 {
-    "linter": {
-      "enabled": true,
-      "rules": {
-        "recommended": true,
-        "noExplicitAny": "warn"
-      }
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "noExplicitAny": "warn"
+    }
   }
 }

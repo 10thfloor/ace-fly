@@ -32,12 +32,12 @@ export class AnycastIP extends StackConstruct {
 
   synthesize(): Record<string, any> {
     return {
-      type: 'anycast-ip',
+      type: "anycast-ip",
       name: this.config.name || this.getId(),
       ipType: this.config.type,
       shared: this.config.shared,
       proxy: this.getResource(this.proxy).getId(),
-      tls: this.getResource(this.tls).getId()
+      tls: this.getResource(this.tls).getId(),
     };
   }
 

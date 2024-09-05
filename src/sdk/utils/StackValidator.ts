@@ -14,12 +14,12 @@ export class StackValidator {
     this.errors = [];
     const resources = this.stack.getResources();
 
-    resources.forEach(resource => this.validateResource(resource));
+    resources.forEach((resource) => this.validateResource(resource));
     this.validateStackConstraints();
     this.validateNoCyclicDependencies();
 
     if (this.errors.length > 0) {
-      this.errors.forEach(error => Logger.error(error));
+      this.errors.forEach((error) => Logger.error(error));
       return false;
     }
 
@@ -28,7 +28,9 @@ export class StackValidator {
 
   private validateResource(resource: StackConstruct): void {
     if (!resource.isValid()) {
-      this.errors.push(`Invalid configuration for resource: ${resource.getId()}`);
+      this.errors.push(
+        `Invalid configuration for resource: ${resource.getId()}`,
+      );
     }
   }
 
@@ -40,8 +42,10 @@ export class StackValidator {
     const graph = this.stack.getDependencyGraph();
     const cycles = graph.findCycles();
     if (cycles.length > 0) {
-      cycles.forEach(cycle => {
-        this.errors.push(`Circular dependency detected: ${cycle.map(node => node.getId()).join(' -> ')}`);
+      cycles.forEach((cycle) => {
+        this.errors.push(
+          `Circular dependency detected: ${cycle.map((node) => node.getId()).join(" -> ")}`,
+        );
       });
     }
   }

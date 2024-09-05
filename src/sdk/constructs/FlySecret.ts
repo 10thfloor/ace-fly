@@ -17,9 +17,9 @@ export class FlySecret extends StackConstruct {
 
   synthesize(): Record<string, any> {
     return {
-      type: 'secret',
+      type: "secret",
       name: this.config.name || this.getId(),
-      key: this.config.key
+      key: this.config.key,
     };
   }
 

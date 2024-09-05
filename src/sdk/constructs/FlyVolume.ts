@@ -17,9 +17,9 @@ export class FlyVolume extends StackConstruct {
 
   synthesize(): Record<string, any> {
     return {
-      type: 'volume',
+      type: "volume",
       name: this.config.name || this.getId(),
-      size: this.config.size
+      size: this.config.size,
     };
   }
 

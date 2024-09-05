@@ -5,7 +5,7 @@ import { StackConstruct } from "./StackConstruct";
 import type { ResourceOrReference } from "../../types";
 import { Dependency } from "../utils/DependencyDecorator";
 
-export interface IFlyPostgresConfig {  
+export interface IFlyPostgresConfig {
   name?: string;
   region: string;
   credentials: {
@@ -21,12 +21,11 @@ export interface IFlyPostgresConfig {
 }
 
 export class FlyPostgres extends StackConstruct {
-
   @Dependency()
   private password: FlySecret;
 
   @Dependency(true)
-  private replicas?: FlyPostgresReplica[]; 
+  private replicas?: FlyPostgresReplica[];
 
   private config: IFlyPostgresConfig;
 
@@ -34,18 +33,19 @@ export class FlyPostgres extends StackConstruct {
     super(stack, id);
     this.config = config;
     this.password = this.getResource(config.credentials.password);
-    this.replicas = config.replicas?.map(replica => this.getResource(replica)) || [];
+    this.replicas =
+      config.replicas?.map((replica) => this.getResource(replica)) || [];
     this.initialize();
   }
 
   synthesize(): Record<string, any> {
     return {
-      type: 'postgres',
+      type: "postgres",
       name: this.config.name || this.getId(),
       region: this.config.region,
       instanceType: this.config.instanceType,
       storage: this.config.storage,
-      replicas: this.replicas?.map(replica => replica.getId())
+      replicas: this.replicas?.map((replica) => replica.getId()),
     };
   }
 

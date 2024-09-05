@@ -21,13 +21,13 @@ export class TlsConfig extends StackConstruct {
 
   synthesize(): Record<string, any> {
     return {
-      type: 'tls-config',
+      type: "tls-config",
       name: this.config.name || this.getId(),
       enabled: this.config.enabled,
       certificate: this.config.certificate,
       alpn: this.config.alpn,
       versions: this.config.versions,
-      privateKey: this.config.privateKey
+      privateKey: this.config.privateKey,
     };
   }
 

@@ -21,9 +21,9 @@ export class Domain extends StackConstruct {
 
   synthesize(): Record<string, any> {
     return {
-      type: 'domain',
+      type: "domain",
       name: this.config.name || this.getId(),
-      domainName: this.config.domainName
+      domainName: this.config.domainName,
     };
   }
 

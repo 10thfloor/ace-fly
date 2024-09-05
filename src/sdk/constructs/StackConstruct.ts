@@ -21,12 +21,20 @@ export abstract class StackConstruct {
     return this.validate();
   }
 
-  protected getResource<T extends StackConstruct>(resourceOrRef: ResourceOrReference<T>): T {
-    return resourceOrRef instanceof ResourceReference ? resourceOrRef.getResource() : resourceOrRef;
+  protected getResource<T extends StackConstruct>(
+    resourceOrRef: ResourceOrReference<T>,
+  ): T {
+    return resourceOrRef instanceof ResourceReference
+      ? resourceOrRef.getResource()
+      : resourceOrRef;
   }
 
   private addDependenciesToStack(): void {
-    const dependencyProperties = Reflect.getMetadata('dependencyProperties', this.constructor) as Map<string | symbol, boolean> || new Map();
+    const dependencyProperties =
+      (Reflect.getMetadata("dependencyProperties", this.constructor) as Map<
+        string | symbol,
+        boolean
+      >) || new Map();
     for (const [propertyKey, _] of dependencyProperties) {
       const dependency = (this as any)[propertyKey];
       this.addDependency(dependency);
@@ -40,16 +48,16 @@ export abstract class StackConstruct {
     } else if (dependency instanceof ResourceReference) {
       this.stack.addDependency(this, dependency.getResource());
     } else if (Array.isArray(dependency)) {
-      dependency.forEach(item => this.addDependency(item));
-    } else if (typeof dependency === 'object' && dependency !== null) {
-      Object.values(dependency).forEach(item => this.addDependency(item));
+      dependency.forEach((item) => this.addDependency(item));
+    } else if (typeof dependency === "object" && dependency !== null) {
+      Object.values(dependency).forEach((item) => this.addDependency(item));
     }
   }
 
   getId(): string {
     return this.id;
   }
-  
+
   abstract synthesize(): Record<string, any>;
 
   protected abstract validate(): boolean;
@@ -62,7 +70,7 @@ export abstract class StackConstruct {
     this: new (stack: FlyStack, id: string, config: any) => T,
     stack: FlyStack,
     id: string,
-    config: any
+    config: any,
   ): T {
     return new this(stack, id, config);
   }

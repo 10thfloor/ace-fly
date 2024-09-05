@@ -23,7 +23,6 @@ export interface IFlyAppConfig {
 }
 
 export class FlyApp extends StackConstruct {
-
   @Dependency()
   private domain: ResourceOrReference<Domain>;
 
@@ -50,30 +49,42 @@ export class FlyApp extends StackConstruct {
     this.config = config;
     this.domain = this.getResource(config.domain);
     this.certificate = this.getResource(config.certificate);
-    this.secrets = config.secrets.map(secret => this.getResource(secret));
+    this.secrets = config.secrets.map((secret) => this.getResource(secret));
     this.publicServices = Object.fromEntries(
-      Object.entries(config.publicServices).map(([key, service]) => [key, this.getResource(service)])
+      Object.entries(config.publicServices).map(([key, service]) => [
+        key,
+        this.getResource(service),
+      ]),
     );
     this.privateServices = Object.fromEntries(
-      Object.entries(config.privateServices).map(([key, service]) => [key, this.getResource(service)])
+      Object.entries(config.privateServices).map(([key, service]) => [
+        key,
+        this.getResource(service),
+      ]),
     );
     this.initialize();
   }
 
   synthesize(): Record<string, any> {
     return {
-      type: 'app',
+      type: "app",
       name: this.config.name || this.getId(),
       domain: this.domain,
       certificate: this.certificate.getId(),
-      secrets: this.secrets.map(secret => secret.getId()),
+      secrets: this.secrets.map((secret) => secret.getId()),
       env: this.config.env,
       publicServices: Object.fromEntries(
-        Object.entries(this.publicServices).map(([key, service]) => [key, service.getId()])
+        Object.entries(this.publicServices).map(([key, service]) => [
+          key,
+          service.getId(),
+        ]),
       ),
       privateServices: Object.fromEntries(
-        Object.entries(this.privateServices).map(([key, service]) => [key, service.getId()])
-      )
+        Object.entries(this.privateServices).map(([key, service]) => [
+          key,
+          service.getId(),
+        ]),
+      ),
     };
   }
 

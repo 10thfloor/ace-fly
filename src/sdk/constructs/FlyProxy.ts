@@ -16,7 +16,6 @@ export interface IFlyProxyConfig {
 }
 
 export class FlyProxy extends StackConstruct {
-  
   @Dependency()
   private machines: {
     [key: string]: ResourceOrReference<FlyMachine>;
@@ -29,26 +28,29 @@ export class FlyProxy extends StackConstruct {
     [key: number]: string;
   };
 
-  private config: IFlyProxyConfig
+  private config: IFlyProxyConfig;
 
   constructor(stack: FlyStack, id: string, config: IFlyProxyConfig) {
     super(stack, id);
     this.machines = config.machines;
     this.ports = config.ports;
     this.loadBalancing = config.loadBalancing;
-    this.config = config
+    this.config = config;
     this.initialize();
   }
 
   synthesize(): Record<string, any> {
     return {
-      type: 'proxy',
+      type: "proxy",
       name: this.config.name || this.getId(),
       machines: Object.fromEntries(
-        Object.entries(this.machines).map(([key, machine]) => [key, this.getResource(machine).getId()])
+        Object.entries(this.machines).map(([key, machine]) => [
+          key,
+          this.getResource(machine).getId(),
+        ]),
       ),
       ports: this.ports,
-      loadBalancing: this.getResource(this.loadBalancing).getId()
+      loadBalancing: this.getResource(this.loadBalancing).getId(),
     };
   }
 
@@ -57,6 +59,6 @@ export class FlyProxy extends StackConstruct {
   }
 
   protected requiredDependencies(): string[] {
-    return ['FlyMachine', 'LBConfig'];
+    return ["FlyMachine", "LBConfig"];
   }
 }

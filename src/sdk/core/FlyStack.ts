@@ -8,9 +8,10 @@ export class FlyStack {
   private name: string;
   private resources: StackConstruct[] = [];
   private dependencyGraph: DependencyGraph = new DependencyGraph();
-  private synthesizer: ConfigurationSynthesizer = new ConfigurationSynthesizer();
+  private synthesizer: ConfigurationSynthesizer =
+    new ConfigurationSynthesizer();
   private validator: StackValidator;
- 
+
   constructor(name: string) {
     this.name = name;
     this.validator = new StackValidator(this);
@@ -43,7 +44,9 @@ export class FlyStack {
 
   synthesize(): Record<string, any> {
     if (!this.validate()) {
-      throw new Error("Stack validation failed. Cannot synthesize invalid stack.");
+      throw new Error(
+        "Stack validation failed. Cannot synthesize invalid stack.",
+      );
     }
     return this.synthesizer.synthesize(this);
   }

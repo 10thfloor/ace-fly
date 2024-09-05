@@ -16,7 +16,6 @@ export interface IFlyMachineConfig {
 }
 
 export class FlyMachine extends StackConstruct {
-  
   @Dependency()
   private autoScaling: AutoScalingConfig;
 
@@ -32,20 +31,20 @@ export class FlyMachine extends StackConstruct {
     super(stack, id);
     this.config = config;
     this.autoScaling = this.getResource(config.autoScaling);
-    this.link = config.link?.map(db => this.getResource(db));
+    this.link = config.link?.map((db) => this.getResource(db));
     this.machineConfig = this.getResource(config.machineConfig);
     this.initialize();
   }
 
   synthesize(): Record<string, any> {
     return {
-      type: 'machine',
+      type: "machine",
       name: this.config.name || this.getId(),
       count: this.config.count,
       regions: this.config.regions,
       autoScaling: this.autoScaling.getId(),
-      link: this.link?.map(db => db.getId()) || [],
-      machineConfig: this.machineConfig.getId()
+      link: this.link?.map((db) => db.getId()) || [],
+      machineConfig: this.machineConfig.getId(),
     };
   }
 
@@ -53,7 +52,6 @@ export class FlyMachine extends StackConstruct {
     // Implement validation logic
     return true;
   }
-
 
   linkDatabase(database: ResourceOrReference<FlyPostgres>): void {
     this.link = [this.getResource(database)];

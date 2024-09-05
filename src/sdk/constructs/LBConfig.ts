@@ -22,10 +22,10 @@ export class LBConfig extends StackConstruct {
 
   synthesize(): Record<string, any> {
     return {
-      type: 'lb-config',
+      type: "lb-config",
       name: this.config.name || this.getId(),
       strategy: this.config.strategy,
-      healthCheck: this.config.healthCheck
+      healthCheck: this.config.healthCheck,
     };
   }
 

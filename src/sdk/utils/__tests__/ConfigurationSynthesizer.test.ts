@@ -28,7 +28,7 @@ describe("ConfigurationSynthesizer", () => {
       minMachines: 1,
       maxMachines: 5,
       targetCPUUtilization: 70,
-      scaleToZero: true
+      scaleToZero: true,
     });
 
     // Create a LBConfig
@@ -37,8 +37,8 @@ describe("ConfigurationSynthesizer", () => {
       healthCheck: {
         path: "/health",
         interval: 30,
-        timeout: 5
-      }
+        timeout: 5,
+      },
     });
 
     // Create a FlyMachineConfig
@@ -47,15 +47,15 @@ describe("ConfigurationSynthesizer", () => {
       memoryMB: 256,
       image: "nginx:latest",
       env: {
-        PORT: "8080"
+        PORT: "8080",
       },
       cmd: ["nginx", "-g", "daemon off;"],
       guest: {
         cpu_kind: "shared",
-        memory_mb: 256
+        memory_mb: 256,
       },
       volumes: [],
-      internalPort: 8080
+      internalPort: 8080,
     });
 
     // Create a FlyMachine
@@ -64,19 +64,19 @@ describe("ConfigurationSynthesizer", () => {
       count: 1,
       regions: ["sfo"],
       autoScaling: new ResourceReference(autoScalingConfig),
-      machineConfig: new ResourceReference(machineConfig)
+      machineConfig: new ResourceReference(machineConfig),
     });
 
     // Create a FlyProxy
     const proxy = new FlyProxy(stack, "proxy", {
       machines: {
-        "test-machine": new ResourceReference(machine)
+        "test-machine": new ResourceReference(machine),
       },
       ports: {
         80: "{{ .internalPort }}",
-        443: "{{ .internalPort }}"
+        443: "{{ .internalPort }}",
       },
-      loadBalancing: new ResourceReference(lbConfig)
+      loadBalancing: new ResourceReference(lbConfig),
     });
 
     // Create a TlsConfig
@@ -85,7 +85,7 @@ describe("ConfigurationSynthesizer", () => {
       certificate: "cert-id",
       privateKey: "key-id",
       alpn: ["h2", "http/1.1"],
-      versions: ["TLSv1.2", "TLSv1.3"]
+      versions: ["TLSv1.2", "TLSv1.3"],
     });
 
     // Create the AnycastIP resource
@@ -93,7 +93,7 @@ describe("ConfigurationSynthesizer", () => {
       type: "v4",
       shared: true,
       proxy: new ResourceReference(proxy),
-      tls: new ResourceReference(tls)
+      tls: new ResourceReference(tls),
     });
 
     // Synthesize the configuration
@@ -109,7 +109,7 @@ describe("ConfigurationSynthesizer", () => {
           minMachines: 1,
           maxMachines: 5,
           targetCPUUtilization: 70,
-          scaleToZero: true
+          scaleToZero: true,
         },
         "lb-config": {
           type: "lb-config",
@@ -118,8 +118,8 @@ describe("ConfigurationSynthesizer", () => {
           healthCheck: {
             path: "/health",
             interval: 30,
-            timeout: 5
-          }
+            timeout: 5,
+          },
         },
         "machine-config": {
           type: "machine-config",
@@ -128,36 +128,36 @@ describe("ConfigurationSynthesizer", () => {
           memoryMB: 256,
           image: "nginx:latest",
           env: {
-            PORT: "8080"
+            PORT: "8080",
           },
           cmd: ["nginx", "-g", "daemon off;"],
           guest: {
             cpu_kind: "shared",
-            memory_mb: 256
+            memory_mb: 256,
           },
           volumes: [],
-          internalPort: 8080
+          internalPort: 8080,
         },
-        "machine": {
+        machine: {
           type: "machine",
           name: "test-machine",
           count: 1,
           regions: ["sfo"],
           autoScaling: "auto-scaling",
           machineConfig: "machine-config",
-          link: []
+          link: [],
         },
-        "proxy": {
+        proxy: {
           type: "proxy",
           name: "proxy",
           machines: {
-            "test-machine": "machine"
+            "test-machine": "machine",
           },
           ports: {
             80: "{{ .internalPort }}",
-            443: "{{ .internalPort }}"
+            443: "{{ .internalPort }}",
           },
-          loadBalancing: "lb-config"
+          loadBalancing: "lb-config",
         },
         "tls-config": {
           type: "tls-config",
@@ -174,9 +174,9 @@ describe("ConfigurationSynthesizer", () => {
           ipType: "v4",
           shared: true,
           proxy: "proxy",
-          tls: "tls-config"
-        }
-      }
+          tls: "tls-config",
+        },
+      },
     });
 
     // Additional specific assertions
@@ -187,7 +187,7 @@ describe("ConfigurationSynthesizer", () => {
   });
 
   it("should handle nested resources correctly", () => {
-     // TODO
+    // TODO
   });
 
   it("should handle arrays of resources correctly", () => {
@@ -199,10 +199,10 @@ describe("ConfigurationSynthesizer", () => {
   });
 
   it("should handle empty configurations", () => {
-     // TODO
+    // TODO
   });
 
   it("should handle resources with no dependencies", () => {
-     // TODO
+    // TODO
   });
 });
