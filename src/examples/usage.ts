@@ -27,12 +27,12 @@ class FlyDeployment extends FlySDK {
 
     const devOrg = new FlyOrg(this.stack, "dev-org");
 
-    const devDomain = FlyDomain.create(this.stack, "dev-domain", {
+    const devDomain = new FlyDomain(this.stack, "dev-domain", {
       name: "dev-domain",
       domainName: "my-app.dev.fly.dev",
     });
 
-    const devDomainCertificate = FlyCertificate.create(
+    const devDomainCertificate = new FlyCertificate(
       this.stack,
       "dev-certificate",
       {
@@ -41,22 +41,22 @@ class FlyDeployment extends FlySDK {
       },
     );
 
-    const secret = FlySecret.create(this.stack, "app-secret", {
+    const secret = new FlySecret(this.stack, "app-secret", {
       name: "my-secret",
       key: "my-secret",
     });
 
-    const dbPassword = FlySecret.create(this.stack, "db-password", {
+    const dbPassword = new FlySecret(this.stack, "db-password", {
       name: "db-password",
       key: "password",
     });
 
-    const webVolume = FlyVolume.create(this.stack, "web-volume", {
+    const webVolume = new FlyVolume(this.stack, "web-volume", {
       name: "web-volume",
       size: "100GB",
     });
 
-    const apiVolume = FlyVolume.create(this.stack, "api-volume", {
+    const apiVolume = new FlyVolume(this.stack, "api-volume", {
       name: "api-volume",
       size: "100GB",
     });
@@ -199,7 +199,7 @@ class FlyDeployment extends FlySDK {
       loadBalancing: loadBalancingConfig,
     });
 
-    const publicWebsite = AnycastIP.create(this.stack, "my-new-ip", {
+    const publicWebsite = new AnycastIP(this.stack, "my-new-ip", {
       type: "v4",
       shared: true,
       proxy: webProxy,

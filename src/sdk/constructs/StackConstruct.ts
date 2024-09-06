@@ -42,7 +42,6 @@ export abstract class StackConstruct {
   }
 
   private addDependency(dependency: any): void {
-    Logger.info(`Adding dependency: ${dependency.getId()}`);
     if (dependency instanceof StackConstruct) {
       this.stack.addDependency(this, dependency);
     } else if (dependency instanceof ResourceReference) {
@@ -73,5 +72,5 @@ export abstract class StackConstruct {
     config: any,
   ): T {
     return new this(stack, id, config);
-  }
+  }  
 }
