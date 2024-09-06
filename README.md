@@ -36,32 +36,32 @@ Currently, ACE has the following constructs, for building applicaitons on Fly.io
 
 #### Core Constructs
 
-- [StackConstruct](../src/sdk/constructs/StackConstruct.ts)
-- [FlyOrg](../src/sdk/constructs/FlyOrg.ts)
-- [FlyApp](../src/sdk/constructs/FlyApp.ts)
+- [StackConstruct](src/sdk/constructs/StackConstruct.ts)
+- [FlyOrg](src/sdk/constructs/FlyOrg.ts)
+- [FlyApp](src/sdk/constructs/FlyApp.ts)
 
 #### Resources
 
-- [FlyProxy](../src/sdk/constructs/FlyProxy.ts)
-- [FlyMachine](../src/sdk/constructs/FlyMachine.ts)
-- [FlyPostgres](../src/sdk/constructs/FlyPostgres.ts)
-- [FlyAnycastIP](../src/sdk/constructs/FlyAnycastIP.ts)
-- [FlyCertificate](../src/sdk/constructs/FlyCertificate.ts)
-- [FlyDomain](../src/sdk/constructs/FlyDomain.ts)
+- [FlyProxy](src/sdk/constructs/FlyProxy.ts)
+- [FlyMachine](src/sdk/constructs/FlyMachine.ts)
+- [FlyPostgres](src/sdk/constructs/FlyPostgres.ts)
+- [FlyAnycastIP](src/sdk/constructs/FlyAnycastIP.ts)
+- [FlyCertificate](src/sdk/constructs/FlyCertificate.ts)
+- [FlyDomain](src/sdk/constructs/FlyDomain.ts)
 
 #### Configs
 
-- [FlyAutoScalingConfig](../src/sdk/constructs/FlyAutoScalingConfig.ts)
-- [FlyMachineConfig](../src/sdk/constructs/FlyMachineConfig.ts)
-- [FlyPostgresReplica](../src/sdk/constructs/FlyPostgresReplica.ts)
-- [FlySecret](../src/sdk/constructs/FlySecret.ts)
-- [FlyVolume](../src/sdk/constructs/FlyVolume.ts)
-- [FlyLBConfig](../src/sdk/constructs/FlyLBConfig.ts)
-- [TlsConfig](../src/sdk/constructs/TlsConfig.ts)
+- [FlyAutoScalingConfig](src/sdk/constructs/FlyAutoScalingConfig.ts)
+- [FlyMachineConfig](src/sdk/constructs/FlyMachineConfig.ts)
+- [FlyPostgresReplica](src/sdk/constructs/FlyPostgresReplica.ts)
+- [FlySecret](src/sdk/constructs/FlySecret.ts)
+- [FlyVolume](src/sdk/constructs/FlyVolume.ts)
+- [FlyLBConfig](src/sdk/constructs/FlyLBConfig.ts)
+- [TlsConfig](src/sdk/constructs/TlsConfig.ts)
 
 These can be composed together to create a fully featured applications.
 
-Examples can be found, including a robist full-stack app in the [examples](../examples) directory.
+Examples can be found, including a robist full-stack app in the [examples](examples) directory.
 
 ### Other Parts of ACE
 
