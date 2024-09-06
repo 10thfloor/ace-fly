@@ -1,17 +1,17 @@
 import { StackConstruct } from "./StackConstruct";
 import { Dependency } from "../utils/DependencyDecorator";
 import type { FlyStack } from "../core/FlyStack";
-import type { Domain } from "./Domain";
+import type { FlyDomain } from "./FlyDomain";
 import type { ResourceOrReference } from "../../types";
 
 export interface ICertificateConfig {
   name?: string;
-  domains: ResourceOrReference<Domain>[];
+  domains: ResourceOrReference<FlyDomain>[];
 }
 
-export class Certificate extends StackConstruct {
+export class FlyCertificate extends StackConstruct {
   @Dependency()
-  private domains: Domain[];
+  private domains: FlyDomain[];
 
   private config: ICertificateConfig;
 

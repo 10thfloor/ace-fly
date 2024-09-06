@@ -1,11 +1,11 @@
 import { StackConstruct } from "./StackConstruct";
 import { Dependency } from "../utils/DependencyDecorator";
 import type { FlyStack } from "../core/FlyStack";
-import type { Certificate } from "./Certificate";
+import type { Certificate } from "./FlyCertificate";
 import type { FlySecret } from "./FlySecret";
-import type { AnycastIP } from "./AnycastIP";
+import type { AnycastIP } from "./FlyAnycastIP";
 import type { FlyProxy } from "./FlyProxy";
-import type { Domain } from "./Domain";
+import type { Domain } from "./FlyDomain";
 import type { ResourceOrReference } from "../../types";
 
 export interface IFlyAppConfig {

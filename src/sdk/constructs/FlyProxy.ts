@@ -1,7 +1,7 @@
 import { StackConstruct } from "./StackConstruct";
 import { Dependency } from "../utils/DependencyDecorator";
 import type { FlyMachine } from "./FlyMachine";
-import type { LBConfig } from "./LBConfig";
+import type { FlyLBConfig } from "./FlyLBConfig";
 import { FlyStack } from "../core/FlyStack";
 import type { ResourceOrReference } from "../../types";
 export interface IFlyProxyConfig {
@@ -12,7 +12,7 @@ export interface IFlyProxyConfig {
   ports: {
     [key: number]: string;
   };
-  loadBalancing: ResourceOrReference<LBConfig>;
+  loadBalancing: ResourceOrReference<FlyLBConfig>;
 }
 
 export class FlyProxy extends StackConstruct {
@@ -22,7 +22,7 @@ export class FlyProxy extends StackConstruct {
   };
 
   @Dependency()
-  private loadBalancing: ResourceOrReference<LBConfig>;
+  private loadBalancing: ResourceOrReference<FlyLBConfig>;
 
   private ports: {
     [key: number]: string;
@@ -56,9 +56,5 @@ export class FlyProxy extends StackConstruct {
 
   protected validate(): boolean {
     return true;
-  }
-
-  protected requiredDependencies(): string[] {
-    return ["FlyMachine", "LBConfig"];
   }
 }

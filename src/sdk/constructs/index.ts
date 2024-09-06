@@ -1,8 +1,8 @@
 // Barrel exports for all of the constructs in this folder.
-export * from "./AnycastIP";
-export * from "./AutoScalingConfig";
-export * from "./Certificate";
-export * from "./Domain";
+export * from "./FlyAnycastIP";
+export * from "./FlyAutoScalingConfig";
+export * from "./FlyCertificate";
+export * from "./FlyDomain";
 export * from "./FlyApp";
 export * from "./FlyMachine";
 export * from "./FlyMachineConfig";
@@ -11,6 +11,6 @@ export * from "./FlyPostgresReplica";
 export * from "./FlyProxy";
 export * from "./FlySecret";
 export * from "./FlyVolume";
-export * from "./LBConfig";
+export * from "./FlyLBConfig";
 export * from "./StackConstruct";
 export * from "./TlsConfig";

@@ -1,19 +1,19 @@
 import { FlySDK, type IFlySDKConfig } from "../sdk/core/FlySDK.js";
 import { FlyStack } from "../sdk/core/FlyStack.js";
 import { FlyOrg } from "../sdk/core/FlyOrg.js";
-import { Domain } from "../sdk/constructs/Domain.js";
-import { Certificate } from "../sdk/constructs/Certificate.js";
+import { FlyDomain } from "../sdk/constructs/FlyDomain.js";
+import { FlyCertificate } from "../sdk/constructs/FlyCertificate.js";
 import { FlySecret } from "../sdk/constructs/FlySecret.js";
 import { FlyVolume } from "../sdk/constructs/FlyVolume.js";
 import { FlyPostgres } from "../sdk/constructs/FlyPostgres.js";
 import { FlyPostgresReplica } from "../sdk/constructs/FlyPostgresReplica.js";
-import { AutoScalingConfig } from "../sdk/constructs/AutoScalingConfig.js";
+import { AutoScalingConfig } from "../sdk/constructs/FlyAutoScalingConfig.js";
 import { TlsConfig } from "../sdk/constructs/TlsConfig.js";
-import { LBConfig } from "../sdk/constructs/LBConfig.js";
+import { FlyLBConfig } from "../sdk/constructs/FlyLBConfig.js";
 import { FlyMachine } from "../sdk/constructs/FlyMachine.js";
 import { FlyMachineConfig } from "../sdk/constructs/FlyMachineConfig.js";
 import { FlyProxy } from "../sdk/constructs/FlyProxy.js";
-import { AnycastIP } from "../sdk/constructs/AnycastIP.js";
+import { AnycastIP } from "../sdk/constructs/FlyAnycastIP.js";
 import { FlyApp } from "../sdk/constructs/FlyApp.js";
 import "reflect-metadata";
 
@@ -25,12 +25,14 @@ class FlyDeployment extends FlySDK {
 
     this.stack = new FlyStack("my-stack");
 
-    const devDomain = Domain.create(this.stack, "dev-domain", {
+    const devOrg = new FlyOrg(this.stack, "dev-org");
+
+    const devDomain = FlyDomain.create(this.stack, "dev-domain", {
       name: "dev-domain",
       domainName: "my-app.dev.fly.dev",
     });
 
-    const devDomainCertificate = Certificate.create(
+    const devDomainCertificate = FlyCertificate.create(
       this.stack,
       "dev-certificate",
       {
@@ -155,13 +157,13 @@ class FlyDeployment extends FlySDK {
 
     const tlsConfig = new TlsConfig(this.stack, "tls-config", {
       enabled: true,
-      certificate: "path/to/cert.pem",
+      certificate: devDomainCertificate,
       privateKey: "path/to/key.pem",
       alpn: ["h2", "http/1.1"],
       versions: ["TLSv1.2", "TLSv1.3"],
     });
 
-    const loadBalancingConfig = new LBConfig(
+    const loadBalancingConfig = new FlyLBConfig(
       this.stack,
       "load-balancing-config",
       {
@@ -226,5 +228,3 @@ const deployment = new FlyDeployment({
   apiToken: "my-api-token",
 });
 
-// This will now throw an error if the stack is invalid
-console.log(JSON.stringify(deployment.stack.synthesize(), null, 2));

@@ -1,10 +1,12 @@
 import type { FlyStack } from "../core/FlyStack";
 import { StackConstruct } from "./StackConstruct";
+import type { ResourceOrReference } from "../../types";
+import type { FlyCertificate } from "./FlyCertificate"
 
 export interface ITlsConfig {
   name?: string;
   enabled: boolean;
-  certificate: string;
+  certificate: ResourceOrReference<FlyCertificate>;
   privateKey: string;
   alpn: string[];
   versions: string[];

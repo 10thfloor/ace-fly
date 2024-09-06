@@ -1,7 +1,7 @@
 import { StackConstruct } from "./StackConstruct";
 import { Dependency } from "../utils/DependencyDecorator";
 import type { FlyStack } from "../core/FlyStack";
-import type { AutoScalingConfig } from "./AutoScalingConfig";
+import type { AutoScalingConfig } from "./FlyAutoScalingConfig";
 import type { FlyMachineConfig } from "./FlyMachineConfig";
 import type { FlyPostgres } from "./FlyPostgres";
 import type { ResourceOrReference } from "../../types";
@@ -31,7 +31,7 @@ export class FlyMachine extends StackConstruct {
     super(stack, id);
     this.config = config;
     this.autoScaling = this.getResource(config.autoScaling);
-    this.link = config.link?.map((db) => this.getResource(db));
+    this.link = config.link?.map((db) => this.getResource(db)) || [];
     this.machineConfig = this.getResource(config.machineConfig);
     this.initialize();
   }
@@ -53,7 +53,7 @@ export class FlyMachine extends StackConstruct {
     return true;
   }
 
-  linkDatabase(database: ResourceOrReference<FlyPostgres>): void {
-    this.link = [this.getResource(database)];
+  addLink(database: ResourceOrReference<FlyPostgres>): void {
+    this.link = [...(this.link || []), this.getResource(database)];
   }
 }

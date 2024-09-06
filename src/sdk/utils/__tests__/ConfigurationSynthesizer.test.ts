@@ -1,13 +1,16 @@
 import { ConfigurationSynthesizer } from "../ConfigurationSynthesizer";
 import { FlyStack } from "../../core/FlyStack";
-import { AnycastIP } from "../../constructs/AnycastIP";
+import { AnycastIP } from "../../constructs/FlyAnycastIP";
 import { FlyProxy } from "../../constructs/FlyProxy";
 import { TlsConfig } from "../../constructs/TlsConfig";
 import { ResourceReference } from "../ResourceReference";
-import { LBConfig } from "../../constructs/LBConfig";
+import { FlyLBConfig } from "../../constructs/FlyLBConfig";
 import { FlyMachineConfig } from "../../constructs/FlyMachineConfig";
 import { FlyMachine } from "../../constructs/FlyMachine";
-import { AutoScalingConfig } from "../../constructs/AutoScalingConfig";
+import { AutoScalingConfig } from "../../constructs/FlyAutoScalingConfig";
+import { FlyCertificate } from "../../constructs/FlyCertificate";
+import { FlyDomain } from "../../constructs/FlyDomain";
+
 
 // @ts-expect-error: bun:test is not install it's local via `bun test` command
 // This is just here to make the type errors go away.
@@ -32,7 +35,7 @@ describe("ConfigurationSynthesizer", () => {
     });
 
     // Create a LBConfig
-    const lbConfig = new LBConfig(stack, "lb-config", {
+    const lbConfig = new FlyLBConfig(stack, "lb-config", {
       strategy: "round_robin",
       healthCheck: {
         path: "/health",
@@ -82,7 +85,17 @@ describe("ConfigurationSynthesizer", () => {
     // Create a TlsConfig
     const tls = new TlsConfig(stack, "tls-config", {
       enabled: true,
-      certificate: "cert-id",
+      certificate: new ResourceReference(
+        new FlyCertificate(stack, "cert-id", {
+          domains: [
+            new ResourceReference(
+              new FlyDomain(stack, "domain", {
+                domainName: "example.com",
+              })
+            ),
+          ],
+        })
+      ),
       privateKey: "key-id",
       alpn: ["h2", "http/1.1"],
       versions: ["TLSv1.2", "TLSv1.3"],
@@ -110,6 +123,16 @@ describe("ConfigurationSynthesizer", () => {
           maxMachines: 5,
           targetCPUUtilization: 70,
           scaleToZero: true,
+        },
+        "cert-id": {
+          domains: ["example.com"],
+          name: "cert-id",
+          type: "certificate",
+        },
+        domain: {
+          domainName: "example.com",
+          name: "domain",
+          type: "domain",
         },
         "lb-config": {
           type: "lb-config",

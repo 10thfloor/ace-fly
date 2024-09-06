@@ -1,7 +1,7 @@
 import type { FlyStack } from "../core/FlyStack";
 import { StackConstruct } from "./StackConstruct";
 
-export interface ILBConfig {
+export interface IFlyLBConfig {
   name?: string;
   strategy: string;
   healthCheck: {
@@ -11,10 +11,10 @@ export interface ILBConfig {
   };
 }
 
-export class LBConfig extends StackConstruct {
-  private config: ILBConfig;
+export class FlyLBConfig extends StackConstruct {
+  private config: IFlyLBConfig;
 
-  constructor(stack: FlyStack, id: string, config: ILBConfig) {
+  constructor(stack: FlyStack, id: string, config: IFlyLBConfig) {
     super(stack, id);
     this.config = config;
     this.initialize();

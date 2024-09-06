@@ -12,8 +12,8 @@ export class FlyStack {
     new ConfigurationSynthesizer();
   private validator: StackValidator;
 
-  constructor(name: string) {
-    this.name = name;
+  constructor(name?: string) {
+    this.name = name || "fly-stack";
     this.validator = new StackValidator(this);
   }
 

@@ -1,15 +1,15 @@
 import { StackConstruct } from "./StackConstruct";
 import type { FlyStack } from "../core/FlyStack";
 
-export interface IDomainConfig {
+export interface IFlyDomainConfig {
   name?: string;
   domainName: string;
 }
 
-export class Domain extends StackConstruct {
-  private config: IDomainConfig;
+export class FlyDomain extends StackConstruct {
+  private config: IFlyDomainConfig;
 
-  constructor(stack: FlyStack, id: string, config: IDomainConfig) {
+  constructor(stack: FlyStack, id: string, config: IFlyDomainConfig) {
     super(stack, id);
     this.config = config;
     this.initialize();
