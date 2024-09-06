@@ -13,7 +13,7 @@ export class FlyStack {
   private validator: StackValidator;
 
   constructor(name?: string) {
-    this.name = name || "fly-stack";
+    this.name = name || `fly-stack-${Math.random()}-${new Date().toLocaleString()}`;
     this.validator = new StackValidator(this);
   }
 
