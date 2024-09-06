@@ -38,6 +38,7 @@ Currently, ACE has the following constructs, for building applicaitons on Fly.io
 - [StackConstruct](src/sdk/constructs/StackConstruct.ts)
 - [FlyOrg](src/sdk/constructs/FlyOrg.ts)
 - [FlyApp](src/sdk/constructs/FlyApp.ts)
+- [HTTPService](src/sdk/constructs/HTTPService.ts)
 
 #### Resources
 
