@@ -31,7 +31,6 @@ const deployment = await RemixDeployment.deploy();
 ### SDK & Constructs
 
 Constructs are the building blocks of ACE. They are used to define your infrastructure and applications.
-
 Currently, ACE has the following constructs, for building applicaitons on Fly.io:
 
 #### Core Constructs
@@ -60,7 +59,6 @@ Currently, ACE has the following constructs, for building applicaitons on Fly.io
 - [TlsConfig](src/sdk/constructs/TlsConfig.ts)
 
 These can be composed together to create a fully featured applications.
-
 Examples can be found, including a robist full-stack app in the [examples](examples) directory.
 
 ### Other Parts of ACE
@@ -76,5 +74,7 @@ ACE has a local development dashboard that allows you to develop your applicatio
 #### The Backend Service the Runs Deployments
 
  ACE has a backend service that is responsible for running deployments. This is a Node.js application that is deployed to Fly.io. It is responsible for creating and managing your infrastructure and applications.
-
  It is built using [Remix](https://remix.run/) and [Supabase](https://supabase.com/) and deployed to Fly.io.
+
+#### Credit
+This project is shamelessly inspired by: [https://sst.dev/](https://sst.dev/)
