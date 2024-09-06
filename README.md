@@ -61,7 +61,7 @@ Currently, ACE has the following constructs, for building applicaitons on Fly.io
 
 These can be composed together to create a fully featured applications.
 
-Examples can be found, including a robist full-stack app in the [examples](examples) directory.
+Examples can be found, including a robist full-stack app in the [examples](src/examples) directory.
 
 ### Other Parts of ACE
 
