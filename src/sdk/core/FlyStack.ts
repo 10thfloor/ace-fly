@@ -5,53 +5,54 @@ import { ConfigurationSynthesizer } from "../utils/ConfigurationSynthesizer";
 import { Logger } from "../utils/Logger";
 
 export class FlyStack {
-  private name: string;
-  private resources: StackConstruct[] = [];
-  private dependencyGraph: DependencyGraph = new DependencyGraph();
-  private synthesizer: ConfigurationSynthesizer =
-    new ConfigurationSynthesizer();
-  private validator: StackValidator;
+	private name: string;
+	private resources: StackConstruct[] = [];
+	private dependencyGraph: DependencyGraph = new DependencyGraph();
+	private synthesizer: ConfigurationSynthesizer =
+		new ConfigurationSynthesizer();
+	private validator: StackValidator;
 
-  constructor(name?: string) {
-    this.name = name || `fly-stack-${Math.random()}-${new Date().toLocaleString()}`;
-    this.validator = new StackValidator(this);
-  }
+	constructor(name?: string) {
+		this.name =
+			name || `fly-stack-${Math.random()}-${new Date().toLocaleString()}`;
+		this.validator = new StackValidator(this);
+	}
 
-  addResource(resource: StackConstruct): void {
-    this.resources.push(resource);
-    this.dependencyGraph.addResource(resource);
-  }
+	addResource(resource: StackConstruct): void {
+		this.resources.push(resource);
+		this.dependencyGraph.addResource(resource);
+	}
 
-  addDependency(dependent: StackConstruct, dependency: StackConstruct): void {
-    this.dependencyGraph.addDependency(dependent, dependency);
-  }
+	addDependency(dependent: StackConstruct, dependency: StackConstruct): void {
+		this.dependencyGraph.addDependency(dependent, dependency);
+	}
 
-  getName(): string {
-    return this.name;
-  }
+	getName(): string {
+		return this.name;
+	}
 
-  getResources(): StackConstruct[] {
-    return this.resources;
-  }
+	getResources(): StackConstruct[] {
+		return this.resources;
+	}
 
-  getDependencyGraph(): DependencyGraph {
-    return this.dependencyGraph;
-  }
+	getDependencyGraph(): DependencyGraph {
+		return this.dependencyGraph;
+	}
 
-  validate(): boolean {
-    return this.validator.validate();
-  }
+	validate(): boolean {
+		return this.validator.validate();
+	}
 
-  synthesize(): Record<string, any> {
-    if (!this.validate()) {
-      throw new Error(
-        "Stack validation failed. Cannot synthesize invalid stack.",
-      );
-    }
-    return this.synthesizer.synthesize(this);
-  }
+	synthesize(): Record<string, any> {
+		if (!this.validate()) {
+			throw new Error(
+				"Stack validation failed. Cannot synthesize invalid stack.",
+			);
+		}
+		return this.synthesizer.synthesize(this);
+	}
 
-  getValidationErrors(): string[] {
-    return this.validator.getErrors();
-  }
+	getValidationErrors(): string[] {
+		return this.validator.getErrors();
+	}
 }

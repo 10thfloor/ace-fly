@@ -65,6 +65,15 @@ Examples can be found, including a robist full-stack app in the [examples](src/e
 
 ### Other Parts of ACE
 
+#### Community Packages
+ACE (Fly) is built on top of a number of other packages:
+
+  - [fly-admin](https://github.com/supabase/fly-admin)
+    - Typescript package for interacting with Fly.io's admin API
+  - [fly-apps/dockerfile-node](https://github.com/fly-apps/dockerfile-node)
+    - Tool for building Dockerfiles for pre-configured Node.js applications on Fly.io
+    - Used in the [examples/applications/remix-app](examples/applications/remix-app) directory to build a Docker image for a Remix application
+
 #### CLI
 
 The CLI is a command-line interface for ACE. It is used to create, update, and manage your infrastructure and applications.
