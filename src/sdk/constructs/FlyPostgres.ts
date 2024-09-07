@@ -1,7 +1,7 @@
 import type { FlyStack } from "../core/FlyStack";
 import type { FlySecret } from "./FlySecret";
 import type { FlyPostgresReplica } from "./FlyPostgresReplica";
-import { StackConstruct } from "./StackConstruct";
+import { StackConstruct } from "../core/StackConstruct";
 import type { ResourceOrReference } from "../../types";
 import { Dependency } from "../utils/DependencyDecorator";
 

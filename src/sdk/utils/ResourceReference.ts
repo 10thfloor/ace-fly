@@ -1,4 +1,4 @@
-import { StackConstruct } from "../constructs/StackConstruct";
+import type { StackConstruct } from "../core/StackConstruct";
 
 export class ResourceReference<T extends StackConstruct> {
 	private readonly resource: T;

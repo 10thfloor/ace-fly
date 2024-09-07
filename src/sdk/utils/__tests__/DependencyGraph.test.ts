@@ -1,5 +1,5 @@
 import { DependencyGraph } from "../DependencyGraph";
-import { StackConstruct } from "../../constructs/StackConstruct";
+import { StackConstruct } from "../../core/StackConstruct";
 import { Dependency } from "../../utils/DependencyDecorator";
 import { FlyStack } from "../../core/FlyStack";
 import "reflect-metadata";

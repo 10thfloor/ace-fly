@@ -1,8 +1,8 @@
-import { StackConstruct } from "./StackConstruct";
+import { StackConstruct } from "../core/StackConstruct";
 import { Dependency } from "../utils/DependencyDecorator";
 import type { FlyMachine } from "./FlyMachine";
 import type { FlyLBConfig } from "./FlyLBConfig";
-import { FlyStack } from "../core/FlyStack";
+import type { FlyStack } from "../core/FlyStack";
 import type { ResourceOrReference } from "../../types";
 export interface IFlyProxyConfig {
 	name?: string;

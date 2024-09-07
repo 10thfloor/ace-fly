@@ -1,4 +1,4 @@
-import type { StackConstruct } from "../constructs/StackConstruct";
+import type { StackConstruct } from "../core/StackConstruct";
 
 export class Validator {
 	static validateResource(resource: StackConstruct): boolean {

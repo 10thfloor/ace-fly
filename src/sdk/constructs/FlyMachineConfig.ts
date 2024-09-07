@@ -1,6 +1,6 @@
 import type { FlyStack } from "../core/FlyStack";
 import type { FlyVolume } from "./FlyVolume";
-import { StackConstruct } from "./StackConstruct";
+import { StackConstruct } from "../core/StackConstruct";
 
 export interface IFlyMachineConfigConfig {
 	name?: string;

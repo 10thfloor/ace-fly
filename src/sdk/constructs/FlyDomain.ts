@@ -1,4 +1,4 @@
-import { StackConstruct } from "./StackConstruct";
+import { StackConstruct } from "../core/StackConstruct";
 import type { FlyStack } from "../core/FlyStack";
 
 export interface IFlyDomainConfig {

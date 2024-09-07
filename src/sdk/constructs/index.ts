@@ -12,5 +12,5 @@ export * from "./FlyProxy";
 export * from "./FlySecret";
 export * from "./FlyVolume";
 export * from "./FlyLBConfig";
-export * from "./StackConstruct";
+export * from "../core/StackConstruct";
 export * from "./TlsConfig";

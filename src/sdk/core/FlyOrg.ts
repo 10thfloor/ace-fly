@@ -1,20 +1,51 @@
-import type { FlyStack } from "../core/FlyStack";
+import type { FlyStack } from "./FlyStack";
 import type { FlyApp } from "../constructs/FlyApp";
+import { StackConstruct } from "./StackConstruct";
+import { Dependency } from "../utils/DependencyDecorator";
 import { DeploymentEngine } from "../deployment/DeploymentEngine";
 
-export class FlyOrg {
-	private stack: FlyStack;
-	private name: string;
+export interface IFlyOrgConfig {
+  name: string;
+}
 
-	constructor(stack: FlyStack, name: string) {
-		this.stack = stack;
-		this.name = name;
+export class FlyOrg extends StackConstruct {
+	private config: IFlyOrgConfig;
+	
+	@Dependency()
+	private apps: FlyApp[] = [];
+
+	constructor(stack: FlyStack, id: string, config: IFlyOrgConfig) {
+		super(stack, id);
+		this.config = config;
+		this.initialize();
 	}
 
-	deploy(app: FlyApp): void {
+	addApp(app: FlyApp): void {
+		this.apps.push(app);
+	}
+
+	deploy(): void {
 		const deploymentEngine = new DeploymentEngine(
-			this.stack.getSDK().getApiClient(),
+			this.getStack().getApiClient()
 		);
-		deploymentEngine.deploy(app);
+		for (const app of this.apps) {
+			deploymentEngine.deploy(app);
+		}
+	}
+
+	synthesize(): Record<string, any> {
+		return {
+			type: "organization",
+			name: this.config.name,
+			apps: this.apps.map(app => app.getId()),
+		};
+	}
+
+	protected validate(): boolean {
+		return !!this.config.name;
+	}
+
+	protected getName(): string {
+		return this.config.name;
 	}
 }

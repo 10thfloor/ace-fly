@@ -1,4 +1,4 @@
-import { StackConstruct } from "../constructs/StackConstruct";
+import type { StackConstruct } from "../core/StackConstruct";
 import { Logger } from "./Logger";
 export interface DependencyNode {
 	resource: StackConstruct;

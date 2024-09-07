@@ -1,5 +1,5 @@
 import type { FlyStack } from "../core/FlyStack";
-import { StackConstruct } from "./StackConstruct";
+import { StackConstruct } from "../core/StackConstruct";
 
 export interface IFlyLBConfig {
 	name?: string;

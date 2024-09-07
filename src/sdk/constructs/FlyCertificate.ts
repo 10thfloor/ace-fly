@@ -1,4 +1,4 @@
-import { StackConstruct } from "./StackConstruct";
+import { StackConstruct } from "../core/StackConstruct";
 import { Dependency } from "../utils/DependencyDecorator";
 import type { FlyStack } from "../core/FlyStack";
 import type { FlyDomain } from "./FlyDomain";

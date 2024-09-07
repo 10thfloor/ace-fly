@@ -13,8 +13,9 @@ import { FlyLBConfig } from "../sdk/constructs/FlyLBConfig.js";
 import { FlyMachine } from "../sdk/constructs/FlyMachine.js";
 import { FlyMachineConfig } from "../sdk/constructs/FlyMachineConfig.js";
 import { FlyProxy } from "../sdk/constructs/FlyProxy.js";
-import { AnycastIP } from "../sdk/constructs/FlyAnycastIP.js";
+import { FlyAnycastIP } from "../sdk/constructs/FlyAnycastIP.js";
 import { FlyApp } from "../sdk/constructs/FlyApp.js";
+import { FlyApiClient } from "../sdk/api/FlyApiClient.js";
 import "reflect-metadata";
 
 class FlyDeployment extends FlySDK {
@@ -23,9 +24,11 @@ class FlyDeployment extends FlySDK {
 	constructor(context: IFlySDKConfig) {
 		super(context);
 
-		this.stack = new FlyStack("my-stack");
+		this.stack = new FlyStack("my-stack", new FlyApiClient(context.apiToken));
 
-		const devOrg = new FlyOrg(this.stack, "dev-org");
+		const devOrg = new FlyOrg(this.stack, "dev-org", {
+			name: "My Development Organization",
+		});
 
 		const devDomain = new FlyDomain(this.stack, "dev-domain", {
 			name: "dev-domain",
@@ -199,11 +202,11 @@ class FlyDeployment extends FlySDK {
 			loadBalancing: loadBalancingConfig,
 		});
 
-		const publicWebsite = new AnycastIP(this.stack, "my-new-ip", {
+		const publicWebsite = new FlyAnycastIP(this.stack, "my-new-ip", {
 			type: "v4",
 			shared: true,
 			proxy: webProxy,
-			tls: tlsConfig,
+			tls: tlsConfig
 		});
 
 		const devApp = new FlyApp(this.stack, "dev-app", {
@@ -211,6 +214,7 @@ class FlyDeployment extends FlySDK {
 			domain: devDomain,
 			certificate: devDomainCertificate,
 			secrets: [secret],
+			regions: ["iad", "lhr"],
 			env: {
 				MY_SECRET: "{{ .secrets.my-secret }}",
 			},

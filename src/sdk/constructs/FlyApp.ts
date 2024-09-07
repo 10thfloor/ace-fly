@@ -1,23 +1,22 @@
-import { StackConstruct } from "./StackConstruct";
+import { StackConstruct } from "../core/StackConstruct";
 import { Dependency } from "../utils/DependencyDecorator";
 import type { FlyStack } from "../core/FlyStack";
 import type { FlyCertificate } from "./FlyCertificate";
 import type { FlySecret } from "./FlySecret";
-import type { AnycastIP } from "./FlyAnycastIP";
+import type { FlyAnycastIP } from "./FlyAnycastIP";
 import type { FlyProxy } from "./FlyProxy";
 import type { FlyDomain } from "./FlyDomain";
 import type { ResourceOrReference } from "../../types";
-
+import type { HttpService } from "./HttpService";
 export interface IFlyAppConfig {
 	name: string;
 	domain: ResourceOrReference<FlyDomain>;
 	certificate: ResourceOrReference<FlyCertificate>;
 	secrets: ResourceOrReference<FlySecret>[];
+	env: Record<string, string>;
+	regions: string[];
 	publicServices: {
-		[name: string]: {
-			env: Record<string, string>;
-			access: ResourceOrReference<AnycastIP>;
-		};
+		[name: string]: ResourceOrReference<FlyAnycastIP | FlyProxy | HttpService>;
 	};
 	privateServices: {
 		[name: string]: ResourceOrReference<FlyProxy>;
@@ -36,7 +35,7 @@ export class FlyApp extends StackConstruct {
 
 	@Dependency()
 	private publicServices: {
-		[name: string]: ResourceOrReference<AnycastIP>;
+		[name: string]: ResourceOrReference<FlyAnycastIP | FlyProxy | HttpService>;
 	};
 
 	@Dependency()
@@ -45,6 +44,8 @@ export class FlyApp extends StackConstruct {
 	};
 
 	private config: IFlyAppConfig;
+
+	private regions: string[];
 
 	constructor(stack: FlyStack, id: string, config: IFlyAppConfig) {
 		super(stack, id);
@@ -55,7 +56,7 @@ export class FlyApp extends StackConstruct {
 		this.publicServices = Object.fromEntries(
 			Object.entries(config.publicServices).map(([key, service]) => [
 				key,
-				this.getResource(service.access),
+				this.getResource(service),
 			]),
 		);
 		this.privateServices = Object.fromEntries(
@@ -64,6 +65,7 @@ export class FlyApp extends StackConstruct {
 				this.getResource(service),
 			]),
 		);
+		this.regions = config.regions || [];
 		this.initialize();
 	}
 
@@ -95,5 +97,13 @@ export class FlyApp extends StackConstruct {
 
 	protected getName(): string {
 		return this.config.name || this.getId();
+	}
+
+	addSecret(secret: FlySecret): void {
+		this.secrets.push(secret);
+	}
+
+	getRegions(): string[] {
+		return this.regions;
 	}
 }

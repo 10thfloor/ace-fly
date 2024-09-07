@@ -1,6 +1,6 @@
 import type { FlyStack } from "../core/FlyStack";
 import { ResourceReference } from "../utils/ResourceReference";
-import { StackConstruct } from "../constructs/StackConstruct";
+import { StackConstruct } from "../core/StackConstruct";
 import { Logger } from "../utils/Logger";
 
 export class ConfigurationSynthesizer {

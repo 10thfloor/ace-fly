@@ -1,5 +1,5 @@
 import type { FlyStack } from "../core/FlyStack";
-import { StackConstruct } from "./StackConstruct";
+import { StackConstruct } from "../core/StackConstruct";
 import type { ResourceOrReference } from "../../types";
 import type { FlyCertificate } from "./FlyCertificate";
 

@@ -1,6 +1,6 @@
-import { StackConstruct } from "./StackConstruct";
+import { StackConstruct } from "../core/StackConstruct";
 import { Dependency } from "../utils/DependencyDecorator";
-import { FlyStack } from "../core/FlyStack";
+import type { FlyStack } from "../core/FlyStack";
 import { FlyMachine } from "./FlyMachine";
 import { FlyMachineConfig } from "./FlyMachineConfig";
 import { AutoScalingConfig } from "./FlyAutoScalingConfig";

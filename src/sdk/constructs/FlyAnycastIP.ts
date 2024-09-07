@@ -1,12 +1,12 @@
 import type { FlyStack } from "../core/FlyStack";
 import type { FlyProxy } from "./FlyProxy";
 import type { TlsConfig } from "./TlsConfig";
-import { StackConstruct } from "./StackConstruct";
+import { StackConstruct } from "../core/StackConstruct";
 import type { ResourceOrReference } from "../../types";
 import { Dependency } from "../utils/DependencyDecorator";
 import { HttpService } from "./HttpService";
 
-export interface IAnycastIPConfig {
+export interface IFlyAnycastIPConfig {
 	name?: string;
 	type: string;
 	shared: boolean;
@@ -14,8 +14,8 @@ export interface IAnycastIPConfig {
 	tls?: ResourceOrReference<TlsConfig>;
 }
 
-export class AnycastIP extends StackConstruct {
-	config: IAnycastIPConfig;
+export class FlyAnycastIP extends StackConstruct {
+	config: IFlyAnycastIPConfig;
 
 	@Dependency()
 	proxy: ResourceOrReference<FlyProxy | HttpService>;
@@ -23,7 +23,7 @@ export class AnycastIP extends StackConstruct {
 	@Dependency(true)
 	tls?: ResourceOrReference<TlsConfig>;
 
-	constructor(stack: FlyStack, id: string, config: IAnycastIPConfig) {
+	constructor(stack: FlyStack, id: string, config: IFlyAnycastIPConfig) {
 		super(stack, id);
 		this.config = config;
 		this.proxy = config.proxy;
@@ -60,5 +60,9 @@ export class AnycastIP extends StackConstruct {
 			);
 		}
 		return true;
+	}
+
+	getName(): string {
+		return this.config.name || this.getId();
 	}
 }

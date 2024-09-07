@@ -1,8 +1,9 @@
-import { StackConstruct } from "../constructs/StackConstruct";
+import type { StackConstruct } from "./StackConstruct";
 import { DependencyGraph } from "../utils/DependencyGraph";
 import { StackValidator } from "../utils/StackValidator";
 import { ConfigurationSynthesizer } from "../utils/ConfigurationSynthesizer";
-import { Logger } from "../utils/Logger";
+import type { Logger } from "../utils/Logger";
+import type { FlyApiClient } from "../api/FlyApiClient";
 
 export class FlyStack {
 	private name: string;
@@ -11,11 +12,12 @@ export class FlyStack {
 	private synthesizer: ConfigurationSynthesizer =
 		new ConfigurationSynthesizer();
 	private validator: StackValidator;
+	private apiClient: FlyApiClient;
 
-	constructor(name?: string) {
-		this.name =
-			name || `fly-stack-${Math.random()}-${new Date().toLocaleString()}`;
+	constructor(name: string, apiClient: FlyApiClient) {
+		this.name = name || `fly-stack-${Math.random()}-${new Date().toLocaleString()}`;
 		this.validator = new StackValidator(this);
+		this.apiClient = apiClient;
 	}
 
 	addResource(resource: StackConstruct): void {
@@ -54,5 +56,9 @@ export class FlyStack {
 
 	getValidationErrors(): string[] {
 		return this.validator.getErrors();
+	}
+
+	getApiClient(): FlyApiClient {
+		return this.apiClient;
 	}
 }

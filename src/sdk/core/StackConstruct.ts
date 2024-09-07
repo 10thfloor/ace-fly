@@ -1,4 +1,4 @@
-import type { FlyStack } from "../core/FlyStack";
+import type { FlyStack } from "./FlyStack";
 import { Logger } from "../utils/Logger";
 import "reflect-metadata";
 import { ResourceReference } from "../utils/ResourceReference";
@@ -84,5 +84,9 @@ export abstract class StackConstruct {
 		const instance = new this(stack, id, config);
 		instance.initialize();
 		return instance;
+	}
+
+	protected getStack(): FlyStack {
+		return this.stack;
 	}
 }

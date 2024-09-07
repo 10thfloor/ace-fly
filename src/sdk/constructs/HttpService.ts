@@ -1,4 +1,4 @@
-import { StackConstruct } from "./StackConstruct";
+import { StackConstruct } from "../core/StackConstruct";
 import type { FlyStack } from "../core/FlyStack";
 
 export interface HttpServiceProps {
@@ -37,6 +37,10 @@ export class HttpService extends StackConstruct {
 			processes: this.config.processes,
 			concurrency: this.config.concurrency,
 		};
+	}
+
+	getInternalPort(): number {
+		return this.config.internal_port;
 	}
 
 	protected validate(): boolean {

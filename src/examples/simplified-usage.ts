@@ -5,9 +5,10 @@ import { FlyDomain } from "../sdk/constructs/FlyDomain.js";
 import { FlyCertificate } from "../sdk/constructs/FlyCertificate.js";
 import { FlySecret } from "../sdk/constructs/FlySecret.js";
 import { HttpService } from "../sdk/constructs/HttpService.js";
-import { AnycastIP } from "../sdk/constructs/FlyAnycastIP.js";
+import { FlyAnycastIP } from "../sdk/constructs/FlyAnycastIP.js";
 import { FlyApp } from "../sdk/constructs/FlyApp.js";
 import { RemixConstruct } from "../sdk/constructs/RemixConstruct.js";
+import { FlyApiClient } from "../sdk/api/FlyApiClient.js";
 import "reflect-metadata";
 
 class FlyDeployment extends FlySDK {
@@ -16,12 +17,17 @@ class FlyDeployment extends FlySDK {
 	constructor(context: IFlySDKConfig) {
 		super(context);
 
-		this.stack = new FlyStack("my-stack");
-		const devOrg = new FlyOrg(this.stack, "dev-org");
+		const apiClient = new FlyApiClient(context.apiToken);
+		this.stack = new FlyStack("my-stack", apiClient);
+		
+		const devOrg = new FlyOrg(this.stack, "dev-org", {
+			name: "My Development Organization"
+		});
 
 		const devDomain = new FlyDomain(this.stack, "dev-domain", {
 			name: "dev-domain",
 			domainName: "my-app.dev.fly.dev",
+			// ... other domain configuration ...
 		});
 
 		const devDomainCertificate = new FlyCertificate(
@@ -30,6 +36,7 @@ class FlyDeployment extends FlySDK {
 			{
 				name: "my-certificate",
 				domains: [devDomain],
+				// ... other certificate configuration ...
 			},
 		);
 
@@ -56,30 +63,24 @@ class FlyDeployment extends FlySDK {
 			},
 		});
 
-		const publicIP = new AnycastIP(this.stack, "my-new-ip", {
-			type: "v4",
-			shared: true,
-			proxy: webService,
-		});
-
 		const remixApp = new FlyApp(this.stack, "dev-app", {
 			name: "my-dev-app",
 			domain: devDomain,
 			certificate: devDomainCertificate,
 			secrets: [sessionSecret],
+			regions: ["iad", "lhr"],
+			env: {
+				SESSION_SECRET: "{{ .secrets.SESSION_SECRET }}",
+			},
 			publicServices: {
-				[remixSite.getName()]: {
-					env: {
-						SESSION_SECRET: "{{ .secrets.SESSION_SECRET }}",
-					},
-					access: publicIP,
-				},
+				[remixSite.getName()]: webService,
 			},
 			privateServices: {},
 		});
+
+		devOrg.addApp(remixApp);
+
+		// Deploy all apps in the organization
+		devOrg.deploy();
 	}
 }
-
-const deployment = new FlyDeployment({
-	apiToken: "my-api-token",
-});

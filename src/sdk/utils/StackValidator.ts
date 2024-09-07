@@ -1,5 +1,5 @@
-import { FlyStack } from "../core/FlyStack";
-import { StackConstruct } from "../constructs/StackConstruct";
+import type { FlyStack } from "../core/FlyStack";
+import type { StackConstruct } from "../core/StackConstruct";
 import { Logger } from "./Logger";
 
 export class StackValidator {
