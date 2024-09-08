@@ -32,4 +32,8 @@ export class AutoScalingConfig extends StackConstruct {
 	protected validate(): boolean {
 		return true;
 	}
+
+	protected getName(): string {
+		return this.config.name || this.getId();
+	}
 }

@@ -116,7 +116,6 @@ export class FlyApplication extends StackConstruct {
 			});
 		}
 
-		this.initialize();
 		this.defaultScaling = {
 			min_machines: 1,
 			max_machines: 1,
@@ -124,6 +123,7 @@ export class FlyApplication extends StackConstruct {
 			auto_scale_down: false,
 			scale_to_zero: false,
 		};
+
 		this.scalingConfig = config.scaling || {
 			min_machines: 1,
 			max_machines: 1,
@@ -138,6 +138,8 @@ export class FlyApplication extends StackConstruct {
 
 		// Add default firewall rule to block all traffic
 		this.addDefaultFirewallRules();
+
+    this.initialize();
 	}
 
 	private addDefaultFirewallRules(): void {
