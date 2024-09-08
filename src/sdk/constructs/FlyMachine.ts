@@ -5,6 +5,7 @@ import type { AutoScalingConfig } from "./FlyAutoScalingConfig";
 import type { FlyMachineConfig } from "./FlyMachineConfig";
 import type { FlyPostgres } from "./FlyPostgres";
 import type { ResourceOrReference } from "../../types";
+import type { ScalingConfig } from "../patterns/FlyApplication";
 
 export interface IFlyMachineConfig {
 	name?: string;

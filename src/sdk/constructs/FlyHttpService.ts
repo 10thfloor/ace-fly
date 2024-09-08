@@ -1,6 +1,7 @@
 import { StackConstruct } from "../core/StackConstruct";
 import type { FlyStack } from "../core/FlyStack";
 import type { ArcJetProtection } from "./ArcJetProtection";
+import type { ScalingConfig } from "../patterns/FlyApplication";
 
 export interface IFlyHttpServiceProps {
 	name?: string;
@@ -17,14 +18,13 @@ export interface IFlyHttpServiceProps {
 		soft_limit: number;
 	};
 	arcjetProtection?: ArcJetProtection;
+	scaling?: ScalingConfig;
 }
-
-export type HttpServiceConfig = IFlyHttpServiceProps;
 
 export class FlyHttpService extends StackConstruct {
 	private config: IFlyHttpServiceProps;
 
-	constructor(stack: FlyStack, id: string, config: HttpServiceConfig) {
+	constructor(stack: FlyStack, id: string, config: IFlyHttpServiceProps) {
 		super(stack, id);
 		this.config = config;
 		this.initialize();

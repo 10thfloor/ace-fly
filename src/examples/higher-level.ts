@@ -20,10 +20,12 @@ const app = new FlyApplication(stack, "my-app", {
 		NODE_ENV: "production",
 	},
 	scaling: {
-		minMachines: 1,
-		maxMachines: 5,
-		autoScaling: true,
-		scaleToZero: false,
+		min_machines: 1,
+		max_machines: 5,
+		auto_scale_up: true,
+		auto_scale_down: true,
+		scale_to_zero: false,
+		target_cpu_percent: 70
 	},
 });
 
@@ -45,10 +47,12 @@ app.addHttpService("WebService", {
 		hard_limit: 25,
 	},
 	scaling: {
-		minMachines: 2,
-		maxMachines: 10,
-		autoScaling: true,
-		scaleToZero: false,
+		min_machines: 2,
+		max_machines: 10,
+		auto_scale_up: true,
+		auto_scale_down: true,
+		scale_to_zero: false,
+		target_cpu_percent: 70
 	},
 });
 

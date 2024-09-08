@@ -14,18 +14,6 @@ import { FlyApi, type ApiRoute } from "./FlyApi";
 import { FlyFirewall, type FirewallRule } from '../constructs/FlyFirewall';
 import { ArcJetProtection, type ArcJetProtectionConfig } from "../constructs/ArcJetProtection";
 
-export interface ScalingRule {
-	metric: "cpu" | "memory";
-	threshold: number;
-	action: "scale_up" | "scale_down";
-}
-
-export interface ScalingConfig {
-	minMachines: number;
-	maxMachines: number;
-	autoScaling: boolean;
-	scaleToZero: boolean;
-}
 
 export interface HttpServiceConfig {
 	service: {
@@ -39,6 +27,17 @@ export interface HttpServiceConfig {
 	scaling?: ScalingConfig;
 }
 
+export interface ScalingConfig {
+	min_machines: number;
+	max_machines: number;
+	auto_scale_up?: boolean;
+	auto_scale_down?: boolean;
+	scale_to_zero?: boolean;
+	target_cpu_percent?: number;
+	target_memory_percent?: number;
+}
+
+// Update FlyApplicationConfig
 export interface FlyApplicationConfig {
 	name: string;
 	organization: string;
@@ -57,24 +56,18 @@ export interface FlyApplicationConfig {
 	scaling?: ScalingConfig;
 }
 
+// Update the class to use the new ScalingConfig
 export class FlyApplication extends StackConstruct {
 	private app: FlyApp;
 	private domain: FlyDomain;
 	private certificate: FlyCertificate;
-	private scalingConfig?: ScalingConfig;
+	private scalingConfig: ScalingConfig;
 	private httpServices: Record<string, FlyHttpService> = {};
 	private secrets: Record<string, FlySecret> = {};
 	private secretNames: string[];
 	private env: Record<string, string> = {};
 	private api?: FlyApi;
-	private database?: FlyPostgresDatabase;
 	private databases: Record<string, FlyPostgresDatabase> = {};
-	private scaling: {
-		minMachines: number;
-		maxMachines: number;
-		autoScaling: boolean;
-		scaleToZero: boolean;
-	};
 	private defaultScaling: ScalingConfig;
 	private firewall: FlyFirewall;
 	private arcjetProtection?: ArcJetProtection;
@@ -124,16 +117,18 @@ export class FlyApplication extends StackConstruct {
 
 		this.initialize();
 		this.defaultScaling = {
-			minMachines: 1,
-			maxMachines: 1,
-			autoScaling: false,
-			scaleToZero: true,
+			min_machines: 1,
+			max_machines: 1,
+			auto_scale_up: false,
+			auto_scale_down: false,
+			scale_to_zero: false,
 		};
-		this.scaling = config.scaling || {
-			minMachines: 1,
-			maxMachines: 1,
-			autoScaling: false,
-			scaleToZero: false,
+		this.scalingConfig = config.scaling || {
+			min_machines: 1,
+			max_machines: 1,
+			auto_scale_up: false,
+			auto_scale_down: false,
+			scale_to_zero: false,
 		};
 
 		this.firewall = new FlyFirewall(this.getStack(), `${this.getId()}-firewall`, {
@@ -179,10 +174,10 @@ export class FlyApplication extends StackConstruct {
 			{
 				name: name,
 				internal_port: config.service.getInternalPort(),
-				auto_stop_machines: scaling.scaleToZero,
-				auto_start_machines: scaling.autoScaling,
-				min_machines_running: scaling.scaleToZero ? 0 : scaling.minMachines,
-				max_machines_running: scaling.maxMachines,
+				auto_stop_machines: scaling.scale_to_zero,
+				auto_start_machines: scaling.auto_scale_up,
+				min_machines_running: scaling.scale_to_zero ? 0 : scaling.min_machines,
+				max_machines_running: scaling.max_machines,
 				processes: ["web"],
 				concurrency: config.concurrency,
 			},
@@ -208,7 +203,7 @@ export class FlyApplication extends StackConstruct {
 		this.firewall.addRule({
 			action: 'allow',
 			protocol: 'tcp',
-			ports: config.service.getInternalPort(),
+			ports: config.service.getInternalPort().toString(),
 			source: '0.0.0.0/0',
 			description: `Allow inbound traffic to ${name} service`,
 			priority: 100
@@ -260,15 +255,13 @@ export class FlyApplication extends StackConstruct {
 				]),
 			),
 			env: this.env,
-			api: this.api?.synthesize(),
-			database: this.database?.synthesize(),
 			databases: Object.fromEntries(
 				Object.entries(this.databases).map(([region, db]) => [
 					region,
 					db.synthesize(),
 				]),
 			),
-			scaling: this.scaling,
+			scaling: this.scalingConfig,
 			firewall: this.firewall.synthesize(),
 			arcjetProtection: this.arcjetProtection?.synthesize(),
 		};
@@ -345,6 +338,7 @@ export class FlyApplication extends StackConstruct {
 				soft_limit: 25,
 				hard_limit: 30,
 			},
+			scaling: this.defaultScaling,
 		});
 
 		if (Object.keys(this.databases).length > 0) {
