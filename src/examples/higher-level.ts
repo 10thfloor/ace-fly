@@ -18,15 +18,7 @@ const app = new FlyApplication(stack, "my-app", {
 	secretNames: ["SESSION_SECRET", "API_KEY"],
 	env: {
 		NODE_ENV: "production",
-	},
-	scaling: {
-		min_machines: 1,
-		max_machines: 5,
-		auto_scale_up: true,
-		auto_scale_down: true,
-		scale_to_zero: false,
-		target_cpu_percent: 70
-	},
+	}
 });
 
 app.addDatabase({
@@ -39,21 +31,14 @@ app.addDatabase({
 	},
 });
 
-app.addHttpService("WebService", {
+app.addHttpService("WebSite", {
 	service: remixSite,
+	forceHttps: true,
 	concurrency: {
 		type: "connections",
 		soft_limit: 20,
 		hard_limit: 25,
-	},
-	scaling: {
-		min_machines: 2,
-		max_machines: 10,
-		auto_scale_up: true,
-		auto_scale_down: true,
-		scale_to_zero: false,
-		target_cpu_percent: 70
-	},
+	}
 });
 
 app.addFirewallRules([
@@ -64,7 +49,7 @@ app.addFirewallRules([
 		source: "0.0.0/0",
 		description: "Allow inbound HTTP and HTTPS traffic",
 		priority: 100,
-	},
+	}
 ]);
 
 app.addArcJetProtection({

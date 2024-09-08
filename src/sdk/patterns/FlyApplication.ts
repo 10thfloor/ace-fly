@@ -19,6 +19,7 @@ export interface HttpServiceConfig {
 	service: {
 		getInternalPort: () => number;
 	};
+	forceHttps?: boolean;
 	concurrency?: {
 		type: "connections" | "requests";
 		soft_limit: number;
@@ -180,6 +181,7 @@ export class FlyApplication extends StackConstruct {
 				max_machines_running: scaling.max_machines,
 				processes: ["web"],
 				concurrency: config.concurrency,
+				force_https: config.forceHttps ?? true,
 			},
 		);
 
