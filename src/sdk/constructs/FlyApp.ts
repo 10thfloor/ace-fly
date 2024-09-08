@@ -7,7 +7,8 @@ import type { FlyAnycastIP } from "./FlyAnycastIP";
 import type { FlyProxy } from "./FlyProxy";
 import type { FlyDomain } from "./FlyDomain";
 import type { ResourceOrReference } from "../../types";
-import type { HttpService } from "./HttpService";
+import type { FlyHttpService } from "./FlyHttpService";
+
 export interface IFlyAppConfig {
 	name: string;
 	domain: ResourceOrReference<FlyDomain>;
@@ -16,7 +17,7 @@ export interface IFlyAppConfig {
 	env: Record<string, string>;
 	regions: string[];
 	publicServices: {
-		[name: string]: ResourceOrReference<FlyAnycastIP | FlyProxy | HttpService>;
+		[name: string]: ResourceOrReference<FlyAnycastIP | FlyProxy | FlyHttpService>;
 	};
 	privateServices: {
 		[name: string]: ResourceOrReference<FlyProxy>;
@@ -35,7 +36,7 @@ export class FlyApp extends StackConstruct {
 
 	@Dependency()
 	private publicServices: {
-		[name: string]: ResourceOrReference<FlyAnycastIP | FlyProxy | HttpService>;
+		[name: string]: ResourceOrReference<FlyAnycastIP | FlyProxy | FlyHttpService>;
 	};
 
 	@Dependency()
@@ -105,5 +106,9 @@ export class FlyApp extends StackConstruct {
 
 	getRegions(): string[] {
 		return this.regions;
+	}
+
+	getId(): string {
+		return super.getId();
 	}
 }

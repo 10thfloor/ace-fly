@@ -1,19 +1,32 @@
 import { StackConstruct } from "../core/StackConstruct";
 import type { FlyStack } from "../core/FlyStack";
 
-export interface FlyPostgresDatabaseProps {
+export interface DatabaseScalingConfig {
+  volumeSize: number; // in GB
+  highAvailability: boolean;
+  machineType?: 'shared' | 'dedicated';
+}
+
+export interface IFlyPostgresDatabaseProps {
   name: string;
   region: string;
   isReplica?: boolean;
   primaryName?: string;
+  scaling?: DatabaseScalingConfig;
 }
 
 export class FlyPostgresDatabase extends StackConstruct {
-  private props: FlyPostgresDatabaseProps;
+  private props: IFlyPostgresDatabaseProps;
+  private scaling: DatabaseScalingConfig;
 
-  constructor(stack: FlyStack, id: string, props: FlyPostgresDatabaseProps) {
+  constructor(stack: FlyStack, id: string, props: IFlyPostgresDatabaseProps) {
     super(stack, id);
     this.props = props;
+    this.scaling = props.scaling || {
+      volumeSize: 10,
+      highAvailability: false,
+      machineType: 'shared',
+    };
   }
 
   getConnectionString(): string {
@@ -35,6 +48,7 @@ export class FlyPostgresDatabase extends StackConstruct {
       region: this.props.region,
       isReplica: this.props.isReplica || false,
       primaryName: this.props.primaryName,
+      scaling: this.scaling,
     };
   }
 }

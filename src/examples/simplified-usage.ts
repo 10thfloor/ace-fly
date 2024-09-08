@@ -4,8 +4,7 @@ import { FlyOrg } from "../sdk/core/FlyOrg.js";
 import { FlyDomain } from "../sdk/constructs/FlyDomain.js";
 import { FlyCertificate } from "../sdk/constructs/FlyCertificate.js";
 import { FlySecret } from "../sdk/constructs/FlySecret.js";
-import { HttpService } from "../sdk/constructs/HttpService.js";
-import { FlyAnycastIP } from "../sdk/constructs/FlyAnycastIP.js";
+import { FlyHttpService } from "../sdk/constructs/FlyHttpService.js";
 import { FlyApp } from "../sdk/constructs/FlyApp.js";
 import { RemixConstruct } from "../sdk/constructs/RemixConstruct.js";
 import { FlyApiClient } from "../sdk/api/FlyApiClient.js";
@@ -49,7 +48,7 @@ class FlyDeployment extends FlySDK {
 			name: "my-remix-site",
 		});
 
-		const webService = new HttpService(this.stack, "web-service", {
+		const webService = new FlyHttpService(this.stack, "web-service", {
 			name: "my-web-service",
 			internal_port: remixSite.machine.getInternalPort(),
 			auto_stop_machines: true,

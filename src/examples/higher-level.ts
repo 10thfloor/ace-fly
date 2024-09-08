@@ -2,9 +2,13 @@ import { FlyApplication } from "../sdk/patterns/FlyApplication";
 import { FlyStack } from "../sdk/core/FlyStack";
 import { FlyApiClient } from "../sdk/api/FlyApiClient";
 import { RemixSite } from "../sdk/patterns/RemixSite";
-import { FlyPostgresDatabase } from "../sdk/patterns/FlyPostgresDatabase"; // New import
+import { ArcJetRuleBuilder } from "../sdk/utils/ArcJetRuleBuilder";
 
 const stack = new FlyStack("my-stack", new FlyApiClient("my-api-token"));
+
+const remixSite = new RemixSite(stack, "remix-site", {
+	projectDir: "./remix-app",
+});
 
 const app = new FlyApplication(stack, "my-app", {
 	name: "my-app",
@@ -15,10 +19,22 @@ const app = new FlyApplication(stack, "my-app", {
 	env: {
 		NODE_ENV: "production",
 	},
+	scaling: {
+		minMachines: 1,
+		maxMachines: 5,
+		autoScaling: true,
+		scaleToZero: false,
+	},
 });
 
-const remixSite = new RemixSite(stack, "remix-site", {
-	projectDir: "./remix-app",
+app.addDatabase({
+	name: "my-app-db",
+	primaryRegion: "iad",
+	scaling: {
+		volumeSize: 50,
+		highAvailability: true,
+		machineType: "dedicated",
+	},
 });
 
 app.addHttpService("WebService", {
@@ -28,20 +44,32 @@ app.addHttpService("WebService", {
 		soft_limit: 20,
 		hard_limit: 25,
 	},
+	scaling: {
+		minMachines: 2,
+		maxMachines: 10,
+		autoScaling: true,
+		scaleToZero: false,
+	},
 });
 
-app.addApi([
+app.addFirewallRules([
 	{
-		path: "/",
-		method: "GET",
-		handlerFile: "src/handlers/hello.js",
+		action: "allow",
+		protocol: "tcp",
+		ports: [80, 443],
+		source: "0.0.0/0",
+		description: "Allow inbound HTTP and HTTPS traffic",
+		priority: 100,
 	},
 ]);
 
-// Attach the database to the application
-app.addDatabase({
-	name: "my-app-db",
-	primaryRegion: "iad"
+app.addArcJetProtection({
+	apiKey: "your-arcjet-api-key",
+	rules: [
+		ArcJetRuleBuilder.rateLimit(100),
+		ArcJetRuleBuilder.botProtection("medium"),
+		ArcJetRuleBuilder.ddosProtection(1000),
+	],
 });
 
 console.log(app.synthesize());

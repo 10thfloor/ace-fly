@@ -1,6 +1,6 @@
 import { StackConstruct } from "../core/StackConstruct";
 import type { FlyStack } from "../core/FlyStack";
-import { HttpService } from "../constructs/HttpService";
+import { FlyHttpService } from "../constructs/FlyHttpService";
 
 export interface ApiRoute {
   path: string;
@@ -14,14 +14,14 @@ export interface FlyApiProps {
 
 export class FlyApi extends StackConstruct {
   private routes: ApiRoute[];
-  private httpService: HttpService;
+  private httpService: FlyHttpService;
   private env: Record<string, string> = {};
 
   constructor(stack: FlyStack, id: string, props: FlyApiProps) {
     super(stack, id);
     this.routes = props.routes;
 
-    this.httpService = new HttpService(stack, `${id}-http-service`, {
+    this.httpService = new FlyHttpService(stack, `${id}-http-service`, {
       name: `${id}-api`,
       internal_port: 3000, 
       auto_stop_machines: true,
@@ -36,7 +36,7 @@ export class FlyApi extends StackConstruct {
     });
   }
 
-  getHttpService(): HttpService {
+  getHttpService(): FlyHttpService {
     return this.httpService;
   }
 
