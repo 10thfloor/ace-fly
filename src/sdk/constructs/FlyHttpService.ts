@@ -1,23 +1,22 @@
 import { StackConstruct } from "../core/StackConstruct";
 import type { FlyStack } from "../core/FlyStack";
-import type { AutoScalingConfig } from "./FlyAutoScalingConfig";
+import type { IFlyAutoScalingConfig } from "./FlyAutoScalingConfig";
 
 export interface IFlyHttpServiceProps {
-	name?: string;
+	name: string;
 	internal_port: number;
 	force_https?: boolean;
-	auto_stop_machines?: boolean;
 	auto_start_machines?: boolean;
+	auto_stop_machines?: boolean;
 	min_machines_running?: number;
 	max_machines_running?: number;
 	processes?: string[];
 	concurrency?: {
-		type: "connections" | "requests";
-		hard_limit: number;
-		soft_limit: number;
+	  type: "connections" | "requests";
+	  soft_limit: number;
+	  hard_limit: number;
 	};
-	scaling?: AutoScalingConfig;
-}
+  }
 
 export class FlyHttpService extends StackConstruct {
 	private config: IFlyHttpServiceProps;

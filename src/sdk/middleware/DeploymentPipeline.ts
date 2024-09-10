@@ -1,24 +1,30 @@
 import type { FlyApplication } from "../patterns/FlyApplication";
 
-interface DeploymentContext {
+export interface DeploymentContext {
   app: FlyApplication;
   config: any;
   // Add other context properties as needed
 }
 
-interface Middleware {
+export interface Middleware {
   process(context: DeploymentContext, next: () => Promise<void>): Promise<void>;
 }
 
-class DeploymentPipeline {
+export class DeploymentPipeline {
   private middlewares: Middleware[] = [];
+  private middlewareNames: Set<string> = new Set();
 
-  use(middleware: Middleware) {
-    console.log(`Adding middleware: ${middleware.constructor.name}`);
+  use(middleware: Middleware, name: string): void {
+    console.log(`Adding middleware: ${name}`);
     this.middlewares.push(middleware);
+    this.middlewareNames.add(name);
   }
 
-  async run(context: DeploymentContext) {
+  hasMiddleware(name: string): boolean {
+    return this.middlewareNames.has(name);
+  }
+
+  async run(context: DeploymentContext): Promise<void> {
     console.log("Starting deployment pipeline");
     const runner = this.composeMiddleware(this.middlewares);
     try {
@@ -133,8 +139,12 @@ export class ScalingConfigurator implements Middleware {
 export class FirewallConfigurator implements Middleware {
   async process(context: DeploymentContext, next: () => Promise<void>) {
     console.log("Configuring firewall rules");
-    if (context.config.firewallRules) {
-      context.app.addFirewallRules(context.config.firewallRules);
+    if (context.config.firewall) {
+      console.log("Firewall config:", JSON.stringify(context.config.firewall, null, 2));
+      console.log("Firewall rules:", JSON.stringify(context.config.firewall.rules, null, 2));
+    } else {
+      console.log("No explicit firewall configuration found. Applying default rules.");
+      // Here you could apply default firewall rules if needed
     }
     await next();
   }
@@ -156,4 +166,3 @@ export class DeploymentStrategy implements Middleware {
   }
 }
 
-export { DeploymentPipeline, type DeploymentContext, type Middleware };

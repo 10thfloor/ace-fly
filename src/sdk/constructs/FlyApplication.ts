@@ -1,11 +1,12 @@
 import { StackConstruct } from "../core/StackConstruct";
-import { FlyApp } from "./FlyIoApp";
+import { FlyIoApp } from "./FlyIoApp";
 import { FlyHttpService } from "./FlyHttpService";
 import { FlyDomain } from "./FlyDomain";
 import { FlySecret } from "./FlySecret";
 import { FlyCertificate } from "./FlyCertificate";
 import type { FlyStack } from "../core/FlyStack";
 import { FlyAnycastIP } from "./FlyAnycastIP";
+import type { IFlyHttpServiceProps } from "./FlyHttpService";
 
 export interface ScalingRule {
   metric: 'cpu' | 'memory';
@@ -19,16 +20,17 @@ export interface ScalingConfig {
   scalingRules: ScalingRule[];
 }
 
-export interface HttpServiceConfig {
-  service: {
-    getInternalPort: () => number;
-  };
-  concurrency?: {
-    type: 'connections' | 'requests';
-    soft_limit: number;
-    hard_limit: number;
-  };
-}
+export interface HttpServiceConfig extends IFlyHttpServiceProps {
+    service: {
+      getInternalPort: () => number;
+    };
+    scaling?: {
+      scaleToZero?: boolean;
+      minMachines?: number;
+      maxMachines?: number;
+      targetCpuUtilization?: number;
+    };
+  }
 
 export interface FlyApplicationConfig {
   name: string;
@@ -40,7 +42,7 @@ export interface FlyApplicationConfig {
 }
 
 export class FlyApplication extends StackConstruct {
-  private app: FlyApp;
+  private app: FlyIoApp;
   private domain: FlyDomain;
   private certificate: FlyCertificate;
   private scalingConfig?: ScalingConfig;
@@ -60,7 +62,7 @@ export class FlyApplication extends StackConstruct {
       domains: [this.domain],
     });
 
-    this.app = new FlyApp(stack, `${id}-app`, {
+    this.app = new FlyIoApp(stack, `${id}-app`, {
       name: config.name,
       domain: this.domain,
       certificate: this.certificate,
@@ -89,28 +91,25 @@ export class FlyApplication extends StackConstruct {
     
   }
 
-  addHttpService(name: string, config: HttpServiceConfig, dedicatedIp?: boolean): void {
-    const httpService = new FlyHttpService(this.getStack(), `${this.getId()}-${name}`, {
-      name: name,
-      internal_port: 'getInternalPort' in config.service ? config.service.getInternalPort() : 8080, // Default port
-      auto_stop_machines: true,
-      auto_start_machines: true,
-      min_machines_running: this.scalingConfig?.minMachines || 1,
-      processes: ["web"],
-      concurrency: config.concurrency,
-    });
-
-    if (dedicatedIp) {
-        const anycastIp = new FlyAnycastIP(this.getStack(), `${this.getId()}-ip-${name}`, {
-          type: "v4",
-          shared: false,
-          proxy: httpService,
-        });
-        // Add logic to associate this IP with the service
+  addHttpService(name: string, config: HttpServiceConfig): void {
+    const httpService = new FlyHttpService(
+      this.getStack(),
+      `${this.getId()}-${name}`,
+      {
+        name: name,
+        internal_port: config.service.getInternalPort(),
+        force_https: config.force_https ?? true,
+        auto_start_machines: config.auto_start_machines ?? true,
+        auto_stop_machines: config.scaling?.scaleToZero ?? false,
+        min_machines_running: config.scaling?.minMachines ?? 1,
+        max_machines_running: config.scaling?.maxMachines ?? 1,
+        processes: ["web"],
+        concurrency: config.concurrency,
       }
+    );
 
     this.httpServices[name] = httpService;
-    // TODO: Add the HTTP service to the underlying FlyApp
+    this.app.addPublicService(name, httpService);
   }
 
   addSecretReference(secretName: string): void {

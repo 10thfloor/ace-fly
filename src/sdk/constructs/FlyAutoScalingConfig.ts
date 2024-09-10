@@ -1,7 +1,7 @@
 import type { FlyStack } from "../core/FlyStack";
 import { StackConstruct } from "../core/StackConstruct";
 
-export interface IAutoScalingConfig {
+export interface IFlyAutoScalingConfig {
 	name?: string;
 	minMachines: number;
 	maxMachines: number;
@@ -9,10 +9,10 @@ export interface IAutoScalingConfig {
 	scaleToZero: boolean;
 }
 
-export class AutoScalingConfig extends StackConstruct {
-	config: IAutoScalingConfig;
+export class FlyAutoScalingConfig extends StackConstruct {
+	config: IFlyAutoScalingConfig;
 
-	constructor(stack: FlyStack, id: string, config: IAutoScalingConfig) {
+	constructor(stack: FlyStack, id: string, config: IFlyAutoScalingConfig) {
 		super(stack, id);
 		this.config = config;
 		this.initialize();

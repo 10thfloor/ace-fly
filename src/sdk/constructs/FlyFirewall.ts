@@ -1,6 +1,6 @@
 import { StackConstruct } from "../core/StackConstruct";
 import type { FlyStack } from "../core/FlyStack";
-import type { FlyApp } from "./FlyIoApp";
+import type { FlyIoApp } from "./FlyIoApp";
 
 export interface FirewallRule {
   action: 'allow' | 'deny';
@@ -13,11 +13,11 @@ export interface FirewallRule {
 }
 
 interface FlyFirewallProps {
-  app: FlyApp;
+  app: FlyIoApp;
 }
 
 export class FlyFirewall extends StackConstruct {
-  private app: FlyApp;
+  private app: FlyIoApp;
   private rules: FirewallRule[] = [];
 
   constructor(stack: FlyStack, id: string, props: FlyFirewallProps) {
@@ -31,9 +31,19 @@ export class FlyFirewall extends StackConstruct {
 
   synthesize(): Record<string, any> {
     return {
-      type: "fly-firewall",
+      type: "firewall",
       appId: this.app.getId(),
-      rules: this.rules,
+      rules: this.rules.length > 0 ? this.rules : [
+        {
+          action: "deny",
+          protocol: "tcp",
+          ports: "1-65535",
+          source: "0.0.0.0/0",
+          destination: "0.0.0.0/0",
+          description: "Default deny all traffic",
+          priority: 2000
+        }
+      ]
     };
   }
 

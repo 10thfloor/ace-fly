@@ -36,12 +36,14 @@ app.addDatabase({
 
 app.addHttpService("WebSite", {
 	service: remixSite,
-	forceHttps: true,
+	force_https: false,
 	concurrency: {
-		type: "connections",
-		soft_limit: 20,
-		hard_limit: 25,
+		type: "requests",
+		soft_limit: 50,
+		hard_limit: 60,
 	},
+	min_machines_running: 2,
+	max_machines_running: 5,
 });
 
 app.addFirewallRules([

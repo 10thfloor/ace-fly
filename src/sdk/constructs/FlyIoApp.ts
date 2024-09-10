@@ -24,7 +24,7 @@ export interface IFlyAppConfig {
 	};
 }
 
-export class FlyApp extends StackConstruct {
+export class FlyIoApp extends StackConstruct {
 	@Dependency()
 	private domain: ResourceOrReference<FlyDomain>;
 
@@ -90,6 +90,14 @@ export class FlyApp extends StackConstruct {
 				]),
 			),
 		};
+	}
+
+	addPublicService(name: string, service: ResourceOrReference<FlyAnycastIP | FlyProxy | FlyHttpService>): void {
+		this.publicServices[name] = service;
+	}
+
+	addPrivateService(name: string, service: ResourceOrReference<FlyProxy>): void {
+		this.privateServices[name] = service;
 	}
 
 	protected validate(): boolean {
