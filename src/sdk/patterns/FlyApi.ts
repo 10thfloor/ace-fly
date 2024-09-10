@@ -34,6 +34,7 @@ export class FlyApi extends StackConstruct {
         hard_limit: 30,
       },
     });
+    this.initialize();
   }
 
   getHttpService(): FlyHttpService {

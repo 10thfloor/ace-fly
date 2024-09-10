@@ -5,7 +5,7 @@ import { FlyDomain } from "../sdk/constructs/FlyDomain.js";
 import { FlyCertificate } from "../sdk/constructs/FlyCertificate.js";
 import { FlySecret } from "../sdk/constructs/FlySecret.js";
 import { FlyHttpService } from "../sdk/constructs/FlyHttpService.js";
-import { FlyApp } from "../sdk/constructs/FlyApp.js";
+import { FlyApp } from "../sdk/constructs/FlyIoApp.js";
 import { RemixConstruct } from "../sdk/constructs/RemixConstruct.js";
 import { FlyApiClient } from "../sdk/api/FlyApiClient.js";
 import "reflect-metadata";

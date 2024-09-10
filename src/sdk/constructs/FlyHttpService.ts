@@ -1,7 +1,6 @@
 import { StackConstruct } from "../core/StackConstruct";
 import type { FlyStack } from "../core/FlyStack";
-import type { ArcJetProtection } from "./ArcJetProtection";
-import type { ScalingConfig } from "../patterns/FlyApplication";
+import type { AutoScalingConfig } from "./FlyAutoScalingConfig";
 
 export interface IFlyHttpServiceProps {
 	name?: string;
@@ -17,8 +16,7 @@ export interface IFlyHttpServiceProps {
 		hard_limit: number;
 		soft_limit: number;
 	};
-	arcjetProtection?: ArcJetProtection;
-	scaling?: ScalingConfig;
+	scaling?: AutoScalingConfig;
 }
 
 export class FlyHttpService extends StackConstruct {
@@ -41,8 +39,7 @@ export class FlyHttpService extends StackConstruct {
 			min_machines_running: this.config.min_machines_running ?? 0,
 			max_machines_running: this.config.max_machines_running ?? 1,
 			processes: this.config.processes,
-			concurrency: this.config.concurrency,
-			arcjetProtection: this.config.arcjetProtection?.synthesize(),
+			concurrency: this.config.concurrency
 		};
 	}
 

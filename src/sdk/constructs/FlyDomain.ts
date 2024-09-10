@@ -30,4 +30,8 @@ export class FlyDomain extends StackConstruct {
 	protected validate(): boolean {
 		return !!this.config.domainName;
 	}
+
+	getName(): string {
+		return this.config.name || this.getId();
+	}
 }

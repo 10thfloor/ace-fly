@@ -1,5 +1,5 @@
 import type { FlyStack } from "./FlyStack";
-import type { FlyApp } from "../constructs/FlyApp";
+import type { FlyApp } from "../constructs/FlyIoApp";
 import { StackConstruct } from "./StackConstruct";
 import { Dependency } from "../utils/DependencyDecorator";
 import { DeploymentEngine } from "../deployment/DeploymentEngine";

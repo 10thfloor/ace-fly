@@ -1,5 +1,5 @@
 import { StackConstruct } from "../core/StackConstruct";
-import { FlyApp } from "./FlyApp";
+import { FlyApp } from "./FlyIoApp";
 import { FlyHttpService } from "./FlyHttpService";
 import { FlyDomain } from "./FlyDomain";
 import { FlySecret } from "./FlySecret";

@@ -14,7 +14,7 @@ import { FlyMachine } from "../sdk/constructs/FlyMachine.js";
 import { FlyMachineConfig } from "../sdk/constructs/FlyMachineConfig.js";
 import { FlyProxy } from "../sdk/constructs/FlyProxy.js";
 import { FlyAnycastIP } from "../sdk/constructs/FlyAnycastIP.js";
-import { FlyApp } from "../sdk/constructs/FlyApp.js";
+import { FlyApp } from "../sdk/constructs/FlyIoApp.js";
 import { FlyApiClient } from "../sdk/api/FlyApiClient.js";
 import "reflect-metadata";
 

@@ -1,6 +1,6 @@
 import { StackConstruct } from "../core/StackConstruct";
 import type { FlyStack } from "../core/FlyStack";
-import type { FlyApp } from "./FlyApp";
+import type { FlyApp } from "./FlyIoApp";
 
 export interface FirewallRule {
   action: 'allow' | 'deny';

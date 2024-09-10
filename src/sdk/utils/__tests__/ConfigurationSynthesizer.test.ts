@@ -1,6 +1,6 @@
 import { ConfigurationSynthesizer } from "../ConfigurationSynthesizer";
 import { FlyStack } from "../../core/FlyStack";
-import { AnycastIP } from "../../constructs/FlyAnycastIP";
+import { FlyAnycastIP } from "../../constructs/FlyAnycastIP";
 import { FlyProxy } from "../../constructs/FlyProxy";
 import { TlsConfig } from "../../constructs/TlsConfig";
 import { ResourceReference } from "../ResourceReference";

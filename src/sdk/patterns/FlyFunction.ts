@@ -7,7 +7,7 @@ import { AutoScalingConfig } from "../constructs/FlyAutoScalingConfig";
 export interface IFlyServerlessFunctionConfig {
 	name: string;
 	handler: string;
-	runtime: "node" | "python" | "go";
+	runtime: "node" | "python" | "go" | "elixir"
 	memory: number;
 	timeout: number;
 	environment?: Record<string, string>;
@@ -64,12 +64,16 @@ export class FlyServerlessFunction extends StackConstruct {
 				},
 			),
 		});
+
+        this.initialize();
 	}
 
 	private getRuntimeImage(): string {
 		switch (this.config.runtime) {
 			case "node":
 				return "flyio/serverless-node:latest";
+			case "elixir":
+				return "flyio/serverless-elixir:latest";
 			case "python":
 				return "flyio/serverless-python:latest";
 			case "go":

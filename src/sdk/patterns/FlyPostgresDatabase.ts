@@ -27,6 +27,7 @@ export class FlyPostgresDatabase extends StackConstruct {
       highAvailability: false,
       machineType: 'shared',
     };
+    this.initialize();
   }
 
   getConnectionString(): string {

@@ -3,7 +3,7 @@ export * from "./FlyAnycastIP";
 export * from "./FlyAutoScalingConfig";
 export * from "./FlyCertificate";
 export * from "./FlyDomain";
-export * from "./FlyApp";
+export * from "./FlyIoApp";
 export * from "./FlyMachine";
 export * from "./FlyMachineConfig";
 export * from "./FlyPostgres";

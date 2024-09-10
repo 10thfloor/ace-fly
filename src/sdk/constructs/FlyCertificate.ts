@@ -33,4 +33,8 @@ export class FlyCertificate extends StackConstruct {
 	protected validate(): boolean {
 		return this.domains.length > 0;
 	}
+
+	protected getName(): string {
+		return this.config.name || this.getId();
+	}
 }
