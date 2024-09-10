@@ -18,10 +18,23 @@ const app = new FlyApplication(stack, "my-app", {
 	organization: "my-org",
 	regions: ["iad", "lhr"],
 	domain: "my-app.fly.dev",
-	secretNames: ["SESSION_SECRET", "API_KEY"],
-	env: {
-		NODE_ENV: "production",
-	},
+	secretNames: [], // Add this line to fix the error
+});
+
+// Add HTTP service with defaults
+app.addHttpService("WebSite", { service: remixSite });
+
+// Set default firewall rules
+app.setDefaultFirewallRules();
+
+// Add custom firewall rule
+app.addFirewallRule({
+	action: "allow",
+	protocol: "tcp",
+	ports: 22,
+	source: "10.0.0.0/8",
+	description: "Allow SSH from internal network",
+	priority: 50,
 });
 
 app.addDatabase({
@@ -33,29 +46,6 @@ app.addDatabase({
 		machineType: "dedicated",
 	},
 });
-
-app.addHttpService("WebSite", {
-	service: remixSite,
-	force_https: false,
-	concurrency: {
-		type: "requests",
-		soft_limit: 50,
-		hard_limit: 60,
-	},
-	min_machines_running: 2,
-	max_machines_running: 5,
-});
-
-app.addFirewallRules([
-	{
-		action: "allow",
-		protocol: "tcp",
-		ports: [80, 443],
-		source: "0.0.0/0",
-		description: "Allow inbound HTTP and HTTPS traffic",
-		priority: 100,
-	},
-]);
 
 app.addArcJetProtection({
 	apiKey: "your-arcjet-api-key",

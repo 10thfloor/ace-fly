@@ -17,6 +17,8 @@ import {
 } from "../constructs/ArcJetProtection";
 import type { IFlyHttpServiceProps } from "../constructs/FlyHttpService";
 import type { IFlyAutoScalingConfig } from "../constructs/FlyAutoScalingConfig";
+import { DefaultConfigs } from "../config/DefaultConfigs";
+
 export interface FlyApplicationConfig {
 	name: string;
 	organization: string;
@@ -110,30 +112,22 @@ export class FlyApplication extends StackConstruct {
 			service: {
 				getInternalPort: () => number;
 			};
-		}
+		},
 	): void {
-		const defaultConfig: IFlyHttpServiceProps = {
-			name: name,
+		const mergedConfig: IFlyHttpServiceProps = {
+			...DefaultConfigs.FlyHttpService,
+			...config,
+			name,
 			internal_port: config.service.getInternalPort(),
-			force_https: true,
-			auto_start_machines: true,
-			auto_stop_machines: false,
-			min_machines_running: 1,
-			max_machines_running: 1,
-			processes: ["web"],
 			concurrency: {
-				type: "connections",
-				soft_limit: 25,
-				hard_limit: 30,
+				...DefaultConfigs.FlyHttpService.concurrency,
+				...config.concurrency,
 			},
 		};
-
-		const mergedConfig = { ...defaultConfig, ...config };
-
 		const httpService = new FlyHttpService(
 			this.getStack(),
 			`${this.getId()}-${name}`,
-			mergedConfig
+			mergedConfig,
 		);
 
 		this.httpServices[name] = httpService;
@@ -176,6 +170,12 @@ export class FlyApplication extends StackConstruct {
 		// Implementation remains the same
 	}
 
+	setDefaultFirewallRules(): void {
+		for (const rule of DefaultConfigs.FlyFirewall.defaultRules) {
+			this.firewall.addRule(rule);
+		}
+	}
+
 	synthesize(): Record<string, any> {
 		const synthesized = {
 			app: this.app.synthesize(),
@@ -215,5 +215,9 @@ export class FlyApplication extends StackConstruct {
 
 	protected getName(): string {
 		return this.config.name;
+	}
+
+	addFirewallRule(rule: FirewallRule): void {
+		this.firewall.addRule(rule);
 	}
 }

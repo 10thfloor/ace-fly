@@ -1,9 +1,10 @@
 import { StackConstruct } from "../core/StackConstruct";
 import type { FlyStack } from "../core/FlyStack";
 import type { IFlyAutoScalingConfig } from "./FlyAutoScalingConfig";
+import { DefaultConfigs } from '../config/DefaultConfigs';
 
 export interface IFlyHttpServiceProps {
-	name: string;
+	name?: string; // Make name optional
 	internal_port: number;
 	force_https?: boolean;
 	auto_start_machines?: boolean;
@@ -21,9 +22,16 @@ export interface IFlyHttpServiceProps {
 export class FlyHttpService extends StackConstruct {
 	private config: IFlyHttpServiceProps;
 
-	constructor(stack: FlyStack, id: string, config: IFlyHttpServiceProps) {
+	constructor(stack: FlyStack, id: string, config: Partial<IFlyHttpServiceProps>) {
 		super(stack, id);
-		this.config = config;
+		this.config = {
+			...DefaultConfigs.FlyHttpService,
+			...config,
+			concurrency: {
+				...DefaultConfigs.FlyHttpService.concurrency,
+				...config.concurrency,
+			},
+		} as IFlyHttpServiceProps;
 		this.initialize();
 	}
 
