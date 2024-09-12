@@ -16,6 +16,7 @@ import { FlyProxy } from "../sdk/constructs/FlyProxy.js";
 import { FlyAnycastIP } from "../sdk/constructs/FlyAnycastIP.js";
 import { FlyIoApp } from "../sdk/constructs/FlyIoApp.js";
 import { FlyApiClient } from "../sdk/api/FlyApiClient.js";
+import { FlyRegion } from "../sdk/types/FlyRegions.js";
 import "reflect-metadata";
 
 class FlyDeployment extends FlySDK {
@@ -114,7 +115,7 @@ class FlyDeployment extends FlySDK {
 		const apiMachine = new FlyMachine(this.stack, "api-server", {
 			name: "my-api-server",
 			count: 1,
-			regions: ["sfo"],
+			regions: [FlyRegion.WASHINGTON_DC],
 			autoScaling: apiAutoScaling,
 			link: [APIdatabase],
 			machineConfig: new FlyMachineConfig(this.stack, "api-server-config", {
@@ -139,7 +140,7 @@ class FlyDeployment extends FlySDK {
 		const webMachine = new FlyMachine(this.stack, "web-server", {
 			name: "my-web-server",
 			count: 1,
-			regions: ["sfo"],
+			regions: [FlyRegion.WASHINGTON_DC],
 			autoScaling: webAutoScaling,
 			machineConfig: new FlyMachineConfig(this.stack, "web-server-config", {
 				cpus: 1,
