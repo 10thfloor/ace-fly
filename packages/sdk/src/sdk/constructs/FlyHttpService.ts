@@ -1,61 +1,65 @@
 import { StackConstruct } from "../core/StackConstruct";
 import type { FlyStack } from "../core/FlyStack";
-import type { IFlyAutoScalingConfig } from "./FlyAutoScalingConfig";
-import { DefaultConfigs } from '../config/DefaultConfigs';
-import { FlyMachineType } from "../types/FlyMachineTypes";
-import type { FlyHttpServiceConcurrencyType } from "../types/FlyHttpServiceConcurrencyTypes";
+import { FlyMachine } from "./FlyMachine";
+import { FlyRegion } from "../types/FlyRegions";
+import { FlyHttpServiceConcurrencyType } from "../types/FlyHttpServiceConcurrencyTypes";
+import { DefaultConfigs } from "../config/DefaultConfigs";
 
 export interface IFlyHttpServiceProps {
 	name?: string; // Make name optional
-	internal_port: number;
 	force_https?: boolean;
 	auto_start_machines?: boolean;
 	auto_stop_machines?: boolean;
 	min_machines_running?: number;
 	max_machines_running?: number;
-	processes?: string[];
 	concurrency?: {
-	  type: FlyHttpServiceConcurrencyType;
-	  soft_limit: number;
-	  hard_limit: number;
+		type: FlyHttpServiceConcurrencyType;
+		soft_limit: number;
+		hard_limit: number;
 	};
-	machineType?: FlyMachineType;
+	regions: FlyRegion[];  // Make this required
+	link?: string;
+	// Remove publicPort from here
 }
 
 export class FlyHttpService extends StackConstruct {
 	private config: IFlyHttpServiceProps;
+	private machines: Set<FlyMachine> = new Set();
 
 	constructor(stack: FlyStack, id: string, config: Partial<IFlyHttpServiceProps>) {
 		super(stack, id);
 		this.config = {
 			...DefaultConfigs.FlyHttpService,
 			...config,
-			concurrency: {
-				...DefaultConfigs.FlyHttpService.concurrency,
-				...config.concurrency,
-			},
 		} as IFlyHttpServiceProps;
-		this.initialize();
+	}
+
+	addMachine(machine: FlyMachine) {
+		const machineRegions = machine.getRegions();
+		if (machineRegions.length === 0 || machineRegions.some(region => this.config.regions.includes(region))) {
+			this.machines.add(machine);
+		} else {
+			throw new Error(`Machine regions [${machineRegions.join(', ')}] do not overlap with service regions [${this.config.regions.join(', ')}]`);
+		}
 	}
 
 	synthesize(): Record<string, any> {
 		return {
 			type: "http_service",
 			name: this.config.name || this.getId(),
-			internal_port: this.config.internal_port,
 			force_https: this.config.force_https ?? true,
 			auto_stop_machines: this.config.auto_stop_machines ?? true,
 			auto_start_machines: this.config.auto_start_machines ?? true,
 			min_machines_running: this.config.min_machines_running ?? 0,
 			max_machines_running: this.config.max_machines_running ?? 1,
-			processes: this.config.processes,
 			concurrency: this.config.concurrency,
-			machineType: this.config.machineType || FlyMachineType.SHARED_CPU_1X,
-		};
-	}
-
-	getInternalPort(): number {
-		return this.config.internal_port;
+			regions: this.config.regions,
+			link: this.config.link,
+			// Remove public_port from here
+			machines: Array.from(this.machines).map(machine => ({
+				...machine.synthesize(),
+			})),
+			};
 	}
 
 	protected validate(): boolean {

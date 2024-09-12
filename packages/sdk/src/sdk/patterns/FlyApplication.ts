@@ -16,7 +16,7 @@ import {
 	type ArcJetProtectionConfig,
 } from "../constructs/ArcJetProtection";
 import type { IFlyHttpServiceProps } from "../constructs/FlyHttpService";
-import type { IFlyAutoScalingConfig } from "../constructs/FlyAutoScalingConfig";
+import type { FlyMachine } from "../constructs/FlyMachine";
 import { DefaultConfigs } from "../config/DefaultConfigs";
 import type { FlyRegion } from "../types/FlyRegions";
 import type { FlyMachineType } from "../types/FlyMachineTypes";
@@ -120,26 +120,30 @@ export class FlyApplication extends StackConstruct {
 	addHttpService(
 		name: string,
 		config: Partial<IFlyHttpServiceProps> & {
-			service: {
-				getInternalPort: () => number;
-			};
-		},
+			machines: FlyMachine[];
+		}
 	): void {
 		const mergedConfig: IFlyHttpServiceProps = {
 			...DefaultConfigs.FlyHttpService,
 			...config,
 			name,
-			internal_port: config.service.getInternalPort(),
+			regions: config.regions || this.config.regions, // Use app regions if not specified
 			concurrency: {
 				...DefaultConfigs.FlyHttpService.concurrency,
 				...config.concurrency,
 			},
 		};
+
 		const httpService = new FlyHttpService(
 			this.getStack(),
 			`${this.getId()}-${name}`,
-			mergedConfig,
+			mergedConfig
 		);
+
+		// Attach machines to the HTTP service
+		config.machines.forEach(machine => {
+			machine.attachToHttpService(httpService);
+		});
 
 		this.httpServices[name] = httpService;
 		this.app.addPublicService(name, httpService);
@@ -186,7 +190,7 @@ export class FlyApplication extends StackConstruct {
 			app: this.app.synthesize(),
 			domain: this.domain.synthesize(),
 			certificate: this.certificate.synthesize(),
-			httpServices: Object.fromEntries(
+			services: Object.fromEntries(
 				Object.entries(this.httpServices).map(([name, service]) => [
 					name,
 					service.synthesize(),

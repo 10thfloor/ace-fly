@@ -24,11 +24,9 @@ export class FlyApi extends StackConstruct {
 
     this.httpService = new FlyHttpService(stack, `${id}-http-service`, {
       name: `${id}-api`,
-      internal_port: 3000, 
       auto_stop_machines: true,
       auto_start_machines: true,
       min_machines_running: 1,
-      processes: ["api"],
       concurrency: {
         type: FlyHttpServiceConcurrencyType.CONNECTIONS,
         soft_limit: 25,
@@ -54,10 +52,6 @@ export class FlyApi extends StackConstruct {
 
   getName(): string {
     return this.getName();
-  }
-
-  getInternalPort(): number {
-    return this.httpService.getInternalPort();
   }
 
   synthesize(): Record<string, any> {

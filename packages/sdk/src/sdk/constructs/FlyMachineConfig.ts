@@ -1,8 +1,8 @@
-import type { FlyStack } from "../core/FlyStack";
-import type { FlyVolume } from "./FlyVolume";
 import { StackConstruct } from "../core/StackConstruct";
+import type { FlyStack } from "../core/FlyStack";
+import { FlyMachineType } from "../types/FlyMachineTypes";
 
-export interface IFlyMachineConfigConfig {
+export interface IFlyMachineConfigProps {
 	name?: string;
 	cpus: number;
 	memoryMB: number;
@@ -10,34 +10,25 @@ export interface IFlyMachineConfigConfig {
 	cmd: string[];
 	env: Record<string, string>;
 	guest: {
-		cpu_kind: string;
+		cpu_kind: "shared" | "performance";
 		memory_mb: number;
 	};
-	volumes: FlyVolume[];
+	volumes?: any[]; // Define a proper type for volumes if needed
 	internalPort: number;
 }
 
 export class FlyMachineConfig extends StackConstruct {
-	private config: IFlyMachineConfigConfig;
+	private config: IFlyMachineConfigProps;
 
-	constructor(stack: FlyStack, id: string, config: IFlyMachineConfigConfig) {
+	constructor(stack: FlyStack, id: string, config: IFlyMachineConfigProps) {
 		super(stack, id);
 		this.config = config;
-		this.initialize();
 	}
 
 	synthesize(): Record<string, any> {
 		return {
-			type: "machine-config",
-			name: this.config.name || this.getId(),
-			cpus: this.config.cpus,
-			memoryMB: this.config.memoryMB,
-			image: this.config.image,
-			cmd: this.config.cmd,
-			env: this.config.env,
-			guest: this.config.guest,
-			volumes: this.config.volumes.map((volume) => volume.getId()),
-			internalPort: this.config.internalPort,
+			...this.config,
+			machineType: this.config.guest.cpu_kind === "shared" ? FlyMachineType.SHARED_CPU_1X : FlyMachineType.DEDICATED_CPU_1X,
 		};
 	}
 
@@ -45,11 +36,11 @@ export class FlyMachineConfig extends StackConstruct {
 		return true;
 	}
 
-	getInternalPort(): number {
-		return this.config.internalPort;
+	getName(): string {
+		return this.config.name || this.getId();
 	}
 
-	protected getName(): string {
-		return this.config.name || this.getId();
+	getInternalPort(): number {
+		return this.config.internalPort;
 	}
 }

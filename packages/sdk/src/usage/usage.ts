@@ -7,7 +7,7 @@ import { FlySecret } from "../sdk/constructs/FlySecret.js";
 import { FlyVolume } from "../sdk/constructs/FlyVolume.js";
 import { FlyPostgres } from "../sdk/constructs/FlyPostgres.js";
 import { FlyPostgresReplica } from "../sdk/constructs/FlyPostgresReplica.js";
-import { FlyAutoScalingConfig } from "../sdk/constructs/FlyAutoScalingConfig.js";
+import {FlyAutoScalingConfig } from "../sdk/constructs/FlyAutoScalingConfig.js";
 import { TlsConfig } from "../sdk/constructs/TlsConfig.js";
 import { FlyLBConfig } from "../sdk/constructs/FlyLBConfig.js";
 import { FlyMachine } from "../sdk/constructs/FlyMachine.js";

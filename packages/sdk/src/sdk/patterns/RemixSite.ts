@@ -1,47 +1,50 @@
-import { StackConstruct } from "../core/StackConstruct";
+import { FlyMachine, IFlyMachineProps } from "../constructs/FlyMachine";
+import { FlyMachineConfig } from "../constructs/FlyMachineConfig";
 import type { FlyStack } from "../core/FlyStack";
-import path from 'node:path';
+import { FlyRegion } from "../types/FlyRegions";
 
-export interface RemixSiteConfig {
-  projectDir: string; // The directory where the Remix project is located
-  sourceDir?: string;
-  buildCommand?: string;
-  startCommand?: string;
-  nodeVersion?: string;
-  port?: number;
-  customEnv?: Record<string, string>;
+interface RemixSiteProps {
+  name: string;
+  projectDir: string;
 }
 
-export class RemixSite extends StackConstruct {
-  private internalPort = 3000; // Default port for Remix apps
+export class RemixSite extends FlyMachine {
+  private projectDir: string;
 
-  constructor(stack: FlyStack, id: string, private config: RemixSiteConfig) {
-    super(stack, id);
-  }
+  constructor(stack: FlyStack, id: string, props: RemixSiteProps) {
 
-  getInternalPort(): number {
-    return this.internalPort;
+    // TODO: Make this configurable
+    const machineConfig = new FlyMachineConfig(stack, `${id}-config`, {
+      cpus: 1,
+      memoryMB: 256,
+      image: "remix:latest", // Adjust as needed
+      cmd: ["npm", "start"],
+      env: {
+        PORT: "{{ .internalPort }}",
+        NODE_ENV: "production",
+      },
+      guest: {
+        cpu_kind: "shared",
+        memory_mb: 256,
+      },
+      internalPort: 3000,
+    });
+
+    super(stack, id, {
+      ...props,
+      name: props.name,
+      machineConfig,
+      regions: [FlyRegion.WASHINGTON_DC],
+      count: 1,
+    });
+
+    this.projectDir = props.projectDir;
   }
 
   synthesize(): Record<string, any> {
     return {
-      type: "remix-site",
-      projectDir: this.config.projectDir,
-      sourceDir: this.config.sourceDir,
-      buildCommand: this.config.buildCommand,
-      startCommand: this.config.startCommand,
-      nodeVersion: this.config.nodeVersion,
-      port: this.config.port,
-      customEnv: this.config.customEnv,
+      ...super.synthesize(),
+      projectDir: this.projectDir,
     };
-  }
-
-  protected validate(): boolean {
-    // Basic validation
-    return !!this.config.projectDir;
-  }
-
-  protected getName(): string {
-    return this.getId();
   }
 }
