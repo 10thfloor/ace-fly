@@ -34,4 +34,11 @@ export class FlyDomain extends StackConstruct {
 	getName(): string {
 		return this.config.name || this.getId();
 	}
+
+	getConfig(): Record<string, any> {
+		return {
+			name: this.config.name,
+			domainName: this.config.domainName,
+		};
+	}
 }

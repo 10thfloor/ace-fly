@@ -1,10 +1,11 @@
-import { FlyMachine, IFlyMachineProps } from "../constructs/FlyMachine";
-import { FlyMachineConfig } from "../constructs/FlyMachineConfig";
+import { StackConstruct } from "../core/StackConstruct";
 import type { FlyStack } from "../core/FlyStack";
-import { FlyRegion } from "../types/FlyRegions";
+import { FlyMachineType } from "../types/FlyMachineTypes";
+import { ProcessGroupConfig } from "./FlyProjectStack";
 import { DefaultConfigs } from "../config/DefaultConfigs";
 
 export interface RemixSiteConfig {
+  name: string;
   projectDir: string;
   sourceDir?: string;
   buildCommand?: string;
@@ -12,69 +13,81 @@ export interface RemixSiteConfig {
   nodeVersion?: string;
   port?: number;
   customEnv?: Record<string, string>;
+  scaling?: Partial<{
+    minMachines: number;
+    maxMachines: number;
+    autoScaleStrategy: 'cpu' | 'requests';
+    targetUtilization: number;
+  }>;
+  machineConfig?: Partial<{
+    cpus: number;
+    memoryMB: number;
+    machineType: FlyMachineType;
+  }>;
 }
 
-export class RemixSite extends FlyMachine {
-  private remixConfig: Required<RemixSiteConfig>;
+export class RemixSite extends StackConstruct {
+  private config: RemixSiteConfig;
 
   constructor(stack: FlyStack, id: string, config: RemixSiteConfig) {
-    const defaultConfig = DefaultConfigs.RemixSite;
-    const mergedConfig = {
-      ...defaultConfig,
+    super(stack, id);
+    this.config = {
+      ...DefaultConfigs.RemixSite,
       ...config,
-      customEnv: { ...defaultConfig.customEnv, ...config.customEnv },
-    } as Required<RemixSiteConfig>;
-
-    const machineConfig = new FlyMachineConfig(stack, `${id}-config`, {
-      cpus: 1,
-      memoryMB: 256,
-      image: "remix:latest", // Adjust as needed
-      cmd: [mergedConfig.startCommand],
-      env: {
-        PORT: `${mergedConfig.port}`,
-        NODE_ENV: "production",
-        ...mergedConfig.customEnv,
+      scaling: {
+        ...DefaultConfigs.RemixSite.scaling,
+        ...config.scaling,
       },
-      guest: {
-        cpu_kind: "shared",
-        memory_mb: 256,
+      machineConfig: {
+        ...DefaultConfigs.RemixSite.machineConfig,
+        ...config.machineConfig,
       },
-      internalPort: mergedConfig.port,
-    });
+    };
+    this.initialize();
+  }
 
-    super(stack, id, {
-      name: id,
-      machineConfig,
-      regions: [FlyRegion.WASHINGTON_DC],
-      count: 1,
-    });
-
-    this.remixConfig = mergedConfig;
+  getProcessGroupConfig(): ProcessGroupConfig {
+    return {
+      name: this.getName(),
+      command: [this.config.startCommand || DefaultConfigs.RemixSite.startCommand],
+      scaling: {
+        minMachines: this.config.scaling?.minMachines ?? DefaultConfigs.RemixSite.scaling.minMachines,
+        maxMachines: this.config.scaling?.maxMachines ?? DefaultConfigs.RemixSite.scaling.maxMachines,
+        autoScaleStrategy: this.config.scaling?.autoScaleStrategy,
+        targetUtilization: this.config.scaling?.targetUtilization,
+      },
+      machineConfig: {
+        cpus: this.config.machineConfig?.cpus ?? DefaultConfigs.RemixSite.machineConfig.cpus,
+        memoryMB: this.config.machineConfig?.memoryMB ?? DefaultConfigs.RemixSite.machineConfig.memoryMB,
+        machineType: this.config.machineConfig?.machineType ?? DefaultConfigs.RemixSite.machineConfig.machineType,
+      },
+    };
   }
 
   getInternalPort(): number {
-    return this.remixConfig.port;
+    return this.config.port || DefaultConfigs.RemixSite.port;
   }
 
   synthesize(): Record<string, any> {
     return {
-      ...super.synthesize(),
       type: "remix-site",
-      projectDir: this.remixConfig.projectDir,
-      sourceDir: this.remixConfig.sourceDir,
-      buildCommand: this.remixConfig.buildCommand,
-      startCommand: this.remixConfig.startCommand,
-      nodeVersion: this.remixConfig.nodeVersion,
-      port: this.remixConfig.port,
-      customEnv: this.remixConfig.customEnv,
+      name: this.config.name,
+      projectDir: this.config.projectDir,
+      sourceDir: this.config.sourceDir,
+      buildCommand: this.config.buildCommand,
+      startCommand: this.config.startCommand,
+      nodeVersion: this.config.nodeVersion,
+      port: this.config.port,
+      customEnv: this.config.customEnv,
+      processGroup: this.getProcessGroupConfig(),
     };
   }
 
   protected validate(): boolean {
-    return !!this.remixConfig.projectDir;
+    return true;
   }
 
-  protected getName(): string {
-    return this.getId();
+  getName(): string {
+    return this.config.name || this.getId()
   }
 }

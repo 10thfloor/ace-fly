@@ -12,12 +12,10 @@ export class FlyStack {
 	private synthesizer: ConfigurationSynthesizer =
 		new ConfigurationSynthesizer();
 	private validator: StackValidator;
-	private apiClient: FlyApiClient;
 
-	constructor(name: string, apiClient: FlyApiClient) {
+	constructor(name: string) {
 		this.name = name || `fly-stack-${Math.random()}-${new Date().toLocaleString()}`;
 		this.validator = new StackValidator(this);
-		this.apiClient = apiClient;
 	}
 
 	addResource(resource: StackConstruct): void {
@@ -58,7 +56,7 @@ export class FlyStack {
 		return this.validator.getErrors();
 	}
 
-	getApiClient(): FlyApiClient {
-		return this.apiClient;
+	sortResourcesByDependency(): StackConstruct[] {
+		return this.dependencyGraph.topologicalSort();
 	}
 }

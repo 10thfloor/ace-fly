@@ -7,6 +7,7 @@ import { FlyCertificate } from "./FlyCertificate";
 import type { FlyStack } from "../core/FlyStack";
 import { FlyAnycastIP } from "./FlyAnycastIP";
 import type { IFlyHttpServiceProps } from "./FlyHttpService";
+import { FlyRegion } from "../types/FlyRegions";
 
 export interface ScalingRule {
   metric: 'cpu' | 'memory';
@@ -35,7 +36,7 @@ export interface HttpServiceConfig extends IFlyHttpServiceProps {
 export interface FlyApplicationConfig {
   name: string;
   organization: string;
-  regions: string[];
+  regions: FlyRegion[];
   domain: string;
   secretNames: string[];
   env?: Record<string, string>; // Add this line
@@ -66,11 +67,10 @@ export class FlyApplication extends StackConstruct {
       name: config.name,
       domain: this.domain,
       certificate: this.certificate,
-      regions: config.regions,
       secrets: [],
       env: config.env || {},
-      publicServices: {},
-      privateServices: {},
+      services: {}, // Add this line
+      regions: config.regions, // Add this line
     });
     
     this.secretNames = config.secretNames;
@@ -109,7 +109,6 @@ export class FlyApplication extends StackConstruct {
     );
 
     this.httpServices[name] = httpService;
-    this.app.addPublicService(name, httpService);
   }
 
   addSecretReference(secretName: string): void {

@@ -55,4 +55,14 @@ export class FlyMachine extends StackConstruct {
 	protected getName(): string {
 		return this.config.name;
 	}
+
+	getConfig(): Record<string, any> {
+		return {
+			name: this.config.name,
+			config: this.config.machineConfig.getConfig(),
+			count: this.config.count,
+			regions: this.config.regions,
+			autoScaling: this.config.autoScaling ? this.config.autoScaling.getConfig() : undefined,
+		};
+	}
 }

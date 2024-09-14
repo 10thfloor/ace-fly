@@ -2,8 +2,8 @@ import type { IFlyHttpServiceProps } from "../constructs/FlyHttpService";
 import type { FirewallRule } from "../constructs/FlyFirewall";
 import type { IFlyAutoScalingConfig } from "../constructs/FlyAutoScalingConfig";
 import { FlyHttpServiceConcurrencyType } from "../types/FlyHttpServiceConcurrencyTypes";
+import { FlyMachineType } from "../types/FlyMachineTypes";
 import type { RemixSiteConfig } from "../patterns/RemixSite";
-
 
 export const DefaultConfigs = {
   FlyHttpService: {
@@ -48,12 +48,21 @@ export const DefaultConfigs = {
   } satisfies IFlyAutoScalingConfig,
 
   RemixSite: {
-    projectDir: "app",
     sourceDir: "app",
     buildCommand: "npm run build",
     startCommand: "npm run start",
     nodeVersion: "18",
     port: 3000,
-    customEnv: {},
-  } satisfies Partial<RemixSiteConfig>,
+    scaling: {
+      minMachines: 1,
+      maxMachines: 1,
+      autoScaleStrategy: 'cpu' as const,
+      targetUtilization: 70,
+    },
+    machineConfig: {
+      cpus: 1,
+      memoryMB: 256,
+      machineType: FlyMachineType.SHARED_CPU_1X,
+    },
+  },
 };

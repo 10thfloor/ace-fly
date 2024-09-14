@@ -30,4 +30,11 @@ export class FlySecret extends StackConstruct {
 	protected getName(): string {
 		return this.config.name || this.getId();
 	}
+
+	getConfig(): Record<string, any> {
+		return {
+			name: this.config.name || this.getId(),
+			key: this.config.key,
+		};
+	}
 }

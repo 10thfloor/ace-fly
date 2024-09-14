@@ -123,4 +123,27 @@ export class DependencyGraph {
 
 		return cycles;
 	}
+
+	topologicalSort(): StackConstruct[] {
+		const visited = new Set<StackConstruct>();
+		const result: StackConstruct[] = [];
+
+		const visit = (node: StackConstruct) => {
+			if (visited.has(node)) return;
+			visited.add(node);
+			
+			const dependencies = this.nodes.get(node)?.dependencies.map(dep => dep.resource) || [];
+			for (const dep of dependencies) {
+				visit(dep);
+			}
+			
+			result.push(node);
+		};
+
+		for (const node of this.nodes.keys()) {
+			visit(node);
+		}
+
+		return result.reverse();
+	}
 }

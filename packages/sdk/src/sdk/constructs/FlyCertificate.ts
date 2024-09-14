@@ -37,4 +37,11 @@ export class FlyCertificate extends StackConstruct {
 	protected getName(): string {
 		return this.config.name || this.getId();
 	}
+
+	getConfig(): Record<string, any> {
+		return {
+			name: this.config.name,
+			domains: this.domains.map(domain => domain.getConfig().domainName),
+		};
+	}
 }

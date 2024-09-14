@@ -6,20 +6,21 @@ import { FlyHttpServiceConcurrencyType } from "../types/FlyHttpServiceConcurrenc
 import { DefaultConfigs } from "../config/DefaultConfigs";
 
 export interface IFlyHttpServiceProps {
-	name?: string; // Make name optional
+	name?: string;
 	force_https?: boolean;
+	internal_port?: number; // Make internal_port optional
 	auto_start_machines?: boolean;
 	auto_stop_machines?: boolean;
 	min_machines_running?: number;
 	max_machines_running?: number;
+	processes?: string[];
 	concurrency?: {
 		type: FlyHttpServiceConcurrencyType;
 		soft_limit: number;
 		hard_limit: number;
 	};
-	regions: FlyRegion[];  // Make this required
+	regions: FlyRegion[]; 
 	link?: string;
-	// Remove publicPort from here
 }
 
 export class FlyHttpService extends StackConstruct {
@@ -31,7 +32,9 @@ export class FlyHttpService extends StackConstruct {
 		this.config = {
 			...DefaultConfigs.FlyHttpService,
 			...config,
-		} as IFlyHttpServiceProps;
+			internal_port: config.internal_port, 
+			regions: config.regions || [], 
+		};
 	}
 
 	addMachine(machine: FlyMachine) {
@@ -69,5 +72,19 @@ export class FlyHttpService extends StackConstruct {
 
 	protected getName(): string {
 		return this.config.name || this.getId();
+	}
+
+	getConfig(): Record<string, any> {
+		return {
+			name: this.config.name,
+			internal_port: this.config.internal_port,
+			auto_stop_machines: this.config.auto_stop_machines,
+			auto_start_machines: this.config.auto_start_machines,
+			min_machines_running: this.config.min_machines_running,
+			max_machines_running: this.config.max_machines_running,
+			concurrency: this.config.concurrency,
+			processes: this.config.processes,
+			regions: this.config.regions,
+		};
 	}
 }

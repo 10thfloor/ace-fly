@@ -3,7 +3,6 @@ import type { FlyStack } from "../core/FlyStack";
 import type { FlyIoApp } from "./FlyIoApp";
 
 export interface ArcJetProtectionConfig {
-  apiKey: string;
   rules: ArcJetRule[];
 }
 
@@ -26,7 +25,6 @@ export class ArcJetProtection extends StackConstruct {
     return {
       type: "arcjet-protection",
       appId: this.app.getId(),
-      apiKey: this.config.apiKey,
       rules: this.config.rules,
     };
   }
@@ -38,5 +36,11 @@ export class ArcJetProtection extends StackConstruct {
 
   protected getName(): string {
     return `${this.app.getId()}-arcjet-protection`;
+  }
+
+  getConfig(): Record<string, any> {
+    return {
+      rules: this.config.rules,
+    };
   }
 }

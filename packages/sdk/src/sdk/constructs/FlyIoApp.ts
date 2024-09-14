@@ -1,122 +1,97 @@
 import { StackConstruct } from "../core/StackConstruct";
-import { Dependency } from "../utils/DependencyDecorator";
 import type { FlyStack } from "../core/FlyStack";
+import type { FlyDomain } from "./FlyDomain";
 import type { FlyCertificate } from "./FlyCertificate";
 import type { FlySecret } from "./FlySecret";
-import type { FlyAnycastIP } from "./FlyAnycastIP";
-import type { FlyProxy } from "./FlyProxy";
-import type { FlyDomain } from "./FlyDomain";
-import type { ResourceOrReference } from "../../types";
 import type { FlyHttpService } from "./FlyHttpService";
+import type { FlyRegion } from "../types/FlyRegions";
 
-export interface IFlyAppConfig {
+export interface FlyIoAppConfig {
 	name: string;
-	domain: ResourceOrReference<FlyDomain>;
-	certificate: ResourceOrReference<FlyCertificate>;
-	secrets: ResourceOrReference<FlySecret>[];
-	env: Record<string, string>;
-	regions: string[];
-	publicServices: {
-		[name: string]: ResourceOrReference<FlyAnycastIP | FlyProxy | FlyHttpService>;
-	};
-	privateServices: {
-		[name: string]: ResourceOrReference<FlyProxy>;
-	};
+	org?: string;
+	regions: FlyRegion[];
+	services: Record<string, FlyHttpService>;
+	env?: Record<string, string>;
+	secrets?: FlySecret[];
+	domain?: FlyDomain;
+	certificate?: FlyCertificate;
 }
 
 export class FlyIoApp extends StackConstruct {
-	@Dependency()
-	private domain: ResourceOrReference<FlyDomain>;
+	private config: FlyIoAppConfig;
 
-	@Dependency()
-	private certificate: ResourceOrReference<FlyCertificate>;
-
-	@Dependency()
-	private secrets: ResourceOrReference<FlySecret>[];
-
-	@Dependency()
-	private publicServices: {
-		[name: string]: ResourceOrReference<FlyAnycastIP | FlyProxy | FlyHttpService>;
-	};
-
-	@Dependency()
-	private privateServices: {
-		[name: string]: ResourceOrReference<FlyProxy>;
-	};
-
-	private config: IFlyAppConfig;
-
-	private regions: string[];
-
-	constructor(stack: FlyStack, id: string, config: IFlyAppConfig) {
+	constructor(stack: FlyStack, id: string, config: FlyIoAppConfig) {
 		super(stack, id);
 		this.config = config;
-		this.domain = this.getResource(config.domain);
-		this.certificate = this.getResource(config.certificate);
-		this.secrets = config.secrets.map((secret) => this.getResource(secret));
-		this.publicServices = Object.fromEntries(
-			Object.entries(config.publicServices).map(([key, service]) => [
-				key,
-				this.getResource(service),
-			]),
-		);
-		this.privateServices = Object.fromEntries(
-			Object.entries(config.privateServices).map(([key, service]) => [
-				key,
-				this.getResource(service),
-			]),
-		);
-		this.regions = config.regions || [];
-		this.initialize();
+		this.validate();
+	}
+
+	addService(name: string, service: FlyHttpService): void {
+		this.config.services[name] = service;
+	}
+
+	addSecret(secret: FlySecret): void {
+		if (!this.config.secrets) {
+			this.config.secrets = [];
+		}
+		this.config.secrets.push(secret);
+	}
+
+	setDomain(domain: FlyDomain): void {
+		this.config.domain = domain;
+	}
+
+	setCertificate(certificate: FlyCertificate): void {
+		this.config.certificate = certificate;
 	}
 
 	synthesize(): Record<string, any> {
 		return {
-			type: "app",
-			name: this.config.name || this.getId(),
-			domain: this.domain,
-			certificate: this.certificate.getId(),
-			secrets: this.secrets.map((secret) => secret.getId()),
-			publicServices: Object.fromEntries(
-				Object.entries(this.publicServices).map(([key, service]) => [
-					key,
-					service.getId(),
-				]),
+			name: this.config.name,
+			org: this.config.org,
+			regions: this.config.regions,
+			services: Object.fromEntries(
+				Object.entries(this.config.services).map(([name, service]) => [
+					name,
+					service.synthesize(),
+				])
 			),
-			privateServices: Object.fromEntries(
-				Object.entries(this.privateServices).map(([key, service]) => [
-					key,
-					service.getId(),
-				]),
-			),
+			env: this.config.env,
+			secrets: this.config.secrets?.map(secret => secret.synthesize()),
+			domain: this.config.domain?.synthesize(),
+			certificate: this.config.certificate?.synthesize(),
 		};
 	}
 
-	addPublicService(name: string, service: ResourceOrReference<FlyAnycastIP | FlyProxy | FlyHttpService>): void {
-		this.publicServices[name] = service;
-	}
-
-	addPrivateService(name: string, service: ResourceOrReference<FlyProxy>): void {
-		this.privateServices[name] = service;
+	getConfig(): Record<string, any> {
+		return {
+			name: this.config.name,
+			org: this.config.org,
+			regions: this.config.regions,
+			services: Object.fromEntries(
+				Object.entries(this.config.services).map(([name, service]) => [
+					name,
+					service.getConfig()
+				])
+			),
+			env: this.config.env,
+			secrets: this.config.secrets?.map(secret => secret.getConfig()) || [],
+			domain: this.config.domain?.getConfig(),
+			certificate: this.config.certificate?.getConfig(),
+		};
 	}
 
 	protected validate(): boolean {
+		if (!this.config.name) {
+			throw new Error("FlyIoApp name is required");
+		}
+		if (!this.config.regions || this.config.regions.length === 0) {
+			throw new Error("At least one region is required for FlyIoApp");
+		}
 		return true;
 	}
 
-	protected getName(): string {
-		return this.config.name || this.getId();
-	}
-
-	addSecret(secret: FlySecret): void {
-		this.secrets.push(secret);
-	}
-
-	getRegions(): string[] {
-		return this.regions;
-	}
-
-	getId(): string {
-		return super.getId();
+	getName(): string {
+		return this.config.name;
 	}
 }

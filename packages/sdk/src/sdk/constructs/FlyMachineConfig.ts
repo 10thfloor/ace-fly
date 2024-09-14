@@ -43,4 +43,17 @@ export class FlyMachineConfig extends StackConstruct {
 	getInternalPort(): number {
 		return this.config.internalPort;
 	}
+
+	getConfig(): Record<string, any> {
+		return {
+			cpus: this.config.cpus,
+			memoryMB: this.config.memoryMB,
+			image: this.config.image,
+			cmd: this.config.cmd,
+			env: this.config.env,
+			guest: this.config.guest,
+			volumes: this.config.volumes,
+			internalPort: this.config.internalPort,
+		};
+	}
 }

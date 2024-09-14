@@ -1,13 +1,18 @@
 export class FlyApiClient {
-	private apiToken: string;
+  private apiToken: string;
 
-	constructor(apiToken: string) {
-		this.apiToken = apiToken;
-	}
+  constructor(apiToken: string) {
+    this.apiToken = apiToken;
+  }
 
-	// Implement methods for interacting with Fly.io API
-	// For example:
-	// async createApp(appConfig: Record<string, any>): Promise<void> { ... }
-	// async updateApp(appName: string, appConfig: Record<string, any>): Promise<void> { ... }
-	// async deleteApp(appName: string): Promise<void> { ... }
+  async createOrUpdateApp(appConfig: any): Promise<void> {
+    // Implement API call to create or update the FlyIoApp
+  }
+
+  async createOrUpdateDomain(domainConfig: any): Promise<void> {
+    // Implement API call to create or update the FlyDomain
+  }
+
+   // Implement other methods similarly
+
 }

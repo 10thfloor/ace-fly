@@ -36,4 +36,13 @@ export class FlyAutoScalingConfig extends StackConstruct {
 	protected getName(): string {
 		return this.config.name || this.getId();
 	}
+
+	getConfig(): Record<string, any> {
+		return {
+			minMachines: this.config.minMachines,
+			maxMachines: this.config.maxMachines,
+			targetCPUUtilization: this.config.targetCPUUtilization,
+			scaleToZero: this.config.scaleToZero,
+		};
+	}
 }

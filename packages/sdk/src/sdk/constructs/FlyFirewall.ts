@@ -58,4 +58,17 @@ export class FlyFirewall extends StackConstruct {
   clearRules(): void {
     this.rules = [];
   }
+
+  getConfig(): Record<string, any> {
+    return {
+      rules: this.rules.map(rule => ({
+        action: rule.action,
+        protocol: rule.protocol,
+        ports: rule.ports,
+        source: rule.source,
+        description: rule.description,
+        priority: rule.priority,
+      })),
+    };
+  }
 }

@@ -1,9 +1,9 @@
-import type { FlyApplication } from "../patterns/FlyApplication";
+import { FlyProjectStack } from "../patterns/FlyProjectStack";
 
 export interface DeploymentContext {
-  app: FlyApplication;
+  app: FlyProjectStack;
   config: any;
-  // Add other context properties as needed
+  dryRun?: boolean;
 }
 
 export interface Middleware {
@@ -37,21 +37,26 @@ export class DeploymentPipeline {
   }
 
   private composeMiddleware(middlewares: Middleware[]) {
+    const sortedMiddlewares = middlewares.sort((a, b) => {
+      const aPriority = (a as any).priority || 0;
+      const bPriority = (b as any).priority || 0;
+      return bPriority - aPriority; // Higher priority first
+    });
+
     return async (context: DeploymentContext) => {
       let index = -1;
       const dispatch = async (i: number): Promise<void> => {
         if (i <= index) return Promise.reject(new Error('next() called multiple times'));
+        if (i >= sortedMiddlewares.length) return Promise.resolve();
         index = i;
-        let middleware = middlewares[i];
-        if (i === middlewares.length) middleware = { process: async () => {} };
-        if (!middleware) return Promise.resolve();
+        const middleware = sortedMiddlewares[i];
         try {
           console.log(`Executing middleware: ${middleware.constructor.name}`);
           await middleware.process(context, () => dispatch(i + 1));
           console.log(`Completed middleware: ${middleware.constructor.name}`);
         } catch (err) {
           console.error(`Error in middleware ${middleware.constructor.name}:`, err);
-          return Promise.reject(err);
+          throw err;
         }
       };
       return dispatch(0);
@@ -64,9 +69,15 @@ export class DeploymentPipeline {
 export class ConfigurationLoader implements Middleware {
   async process(context: DeploymentContext, next: () => Promise<void>) {
     console.log("Loading configuration");
-    context.config = { /* loaded config */ };
+    const loadedConfig = this.loadConfiguration();
+    context.config = { ...context.config, ...loadedConfig };
     console.log("Configuration loaded:", context.config);
     await next();
+  }
+
+  private loadConfiguration(): any {
+    // Implement your configuration loading logic here
+    return {};
   }
 }
 
@@ -100,7 +111,8 @@ export class DatabaseSetup implements Middleware {
   async process(context: DeploymentContext, next: () => Promise<void>) {
     console.log("Setting up databases");
     if (context.config.database) {
-      context.app.addDatabase(context.config.database);
+       // Setup Database
+       console.log("Setting up database:", context.config.database);
     }
     await next();
   }
@@ -111,7 +123,7 @@ export class ServiceConfigurator implements Middleware {
     console.log("Configuring services");
     if (context.config.services) {
       for (const serviceConfig of context.config.services) {
-        context.app.addHttpService(serviceConfig.name, serviceConfig);
+        console.log("Configuring service:", serviceConfig);
       }
     }
     await next();
@@ -131,6 +143,7 @@ export class ScalingConfigurator implements Middleware {
     console.log("Configuring scaling");
     if (context.config.scaling) {
       // TODO: Implement scaling configurator
+      console.log("Scaling config:", JSON.stringify(context.config.scaling, null, 2));
     }
     await next();
   }
@@ -154,6 +167,7 @@ export class ObservabilitySetup implements Middleware {
   async process(context: DeploymentContext, next: () => Promise<void>) {
     console.log("Setting up observability");
     // This could include configuring metrics, logging, and tracing
+    console.log("Observability config:", JSON.stringify(context.config.observability, null, 2));
     await next();
   }
 }
@@ -162,6 +176,7 @@ export class DeploymentStrategy implements Middleware {
   async process(context: DeploymentContext, next: () => Promise<void>) {
     console.log("Applying deployment strategy");
     // This could be blue-green, canary, or other deployment strategies
+    console.log("Deployment strategy:", context.config.deploymentStrategy);
     await next();
   }
 }
