@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, mock } from 'bun:test';
 import { App } from '../../src/constructs/App';
 import { flyctlExecute } from '../../src/utils/flyctl';
 import { Logger } from '../../src/utils/logger';
@@ -8,7 +8,7 @@ describe('App Construct', () => {
   let logger: Logger;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    mock.restore();
     logger = new Logger();
     app = new App({
       name: 'test-app',
@@ -20,7 +20,9 @@ describe('App Construct', () => {
   });
 
   it('should deploy the app successfully', async () => {
-    (flyctlExecute as any).mockResolvedValue({ stdout: '', stderr: '' });
+    mock.module('../../src/utils/flyctl', () => ({
+      flyctlExecute: () => Promise.resolve({ stdout: '', stderr: '' }),
+    }));
 
     await app.deploy();
 
@@ -28,14 +30,18 @@ describe('App Construct', () => {
   });
 
   it('should handle deployment errors gracefully', async () => {
-    (flyctlExecute as any).mockRejectedValue(new Error('Deployment failed'));
+    mock.module('../../src/utils/flyctl', () => ({
+      flyctlExecute: () => Promise.reject(new Error('Deployment failed')),
+    }));
 
     await expect(app.deploy()).rejects.toThrow('Deployment failed');
     expect(flyctlExecute).toHaveBeenCalledWith('flyctl deploy --app test-app');
   });
 
   it('should scale the app successfully', async () => {
-    (flyctlExecute as any).mockResolvedValue({ stdout: '', stderr: '' });
+    mock.module('../../src/utils/flyctl', () => ({
+      flyctlExecute: () => Promise.resolve({ stdout: '', stderr: '' }),
+    }));
 
     await app.scale(3);
 
@@ -43,7 +49,9 @@ describe('App Construct', () => {
   });
 
   it('should handle scaling errors gracefully', async () => {
-    (flyctlExecute as any).mockRejectedValue(new Error('Scaling failed'));
+    mock.module('../../src/utils/flyctl', () => ({
+      flyctlExecute: () => Promise.reject(new Error('Scaling failed')),
+    }));
 
     await expect(app.scale(3)).rejects.toThrow('Scaling failed');
     expect(flyctlExecute).toHaveBeenCalledWith('flyctl scale count 3 --app test-app');

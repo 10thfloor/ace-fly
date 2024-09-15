@@ -10,4 +10,8 @@ export class Logger {
     error(message: string) {
       console.error(`\x1b[31m[ERROR]\x1b[0m ${message}`);
     }
+
+    warn(message: string) {
+        console.warn(`\x1b[33m[WARN]\x1b[0m ${message}`);
+    }
   }

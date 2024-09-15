@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, mock } from 'bun:test';
 import { CleanupManager } from '../../src/utils/cleanup';
 import { App } from '../../src/constructs/App';
 import { flyctlExecute } from '../../src/utils/flyctl';
@@ -10,7 +10,7 @@ describe('CleanupManager', () => {
   let app: App;
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    mock.restore();
     logger = new Logger();
     app = new App({
       name: 'test-app',
@@ -30,13 +30,20 @@ describe('CleanupManager', () => {
     const mockMachines = JSON.stringify([
       { name: 'machine-1', status: 'running', region: 'iad', volume_names: ['attached-volume-1'] },
     ]);
-
-    (flyctlExecute as any)
-      .mockImplementationOnce(() => Promise.resolve({ stdout: mockVolumes, stderr: '' })) // List volumes
-      .mockImplementationOnce(() => Promise.resolve({ stdout: mockMachines, stderr: '' })) // List machines
-      .mockImplementationOnce(() => Promise.resolve({ stdout: '', stderr: '' })) // Machine show for machine-1
-      .mockImplementationOnce(() => Promise.resolve({ stdout: '', stderr: '' })) // Destroy orphan-volume-1
-      .mockImplementationOnce(() => Promise.resolve({ stdout: '', stderr: '' })); // Destroy orphan-volume-2
+    
+    let callCount = 0;
+    mock.module('../../src/utils/flyctl', () => ({
+      flyctlExecute: () => {
+        callCount++;
+        switch (callCount) {
+          case 1: return Promise.resolve({ stdout: mockVolumes, stderr: '' });
+          case 2: return Promise.resolve({ stdout: mockMachines, stderr: '' });
+          case 3: return Promise.resolve({ stdout: '', stderr: '' });
+          case 4: return Promise.resolve({ stdout: '', stderr: '' });
+          default: return Promise.resolve({ stdout: '', stderr: '' });
+        }
+      },
+    }));
 
     await cleanupManager.cleanupOrphanedResources();
 
@@ -56,10 +63,17 @@ describe('CleanupManager', () => {
       { name: 'machine-1', status: 'running', region: 'iad', volume_names: ['attached-volume-1'] },
     ]);
 
-    (flyctlExecute as any)
-      .mockImplementationOnce(() => Promise.resolve({ stdout: mockVolumes, stderr: '' })) // List volumes
-      .mockImplementationOnce(() => Promise.resolve({ stdout: mockMachines, stderr: '' })) // List machines
-      .mockImplementationOnce(() => Promise.resolve({ stdout: '', stderr: '' })); // Machine show for machine-1
+    let callCount = 0;
+    mock.module('../../src/utils/flyctl', () => ({
+      flyctlExecute: () => {
+        callCount++;
+        switch (callCount) {
+          case 1: return Promise.resolve({ stdout: mockVolumes, stderr: '' });
+          case 2: return Promise.resolve({ stdout: mockMachines, stderr: '' });
+          default: return Promise.resolve({ stdout: '', stderr: '' });
+        }
+      },
+    }));
 
     await cleanupManager.cleanupOrphanedResources();
 
@@ -79,12 +93,19 @@ describe('CleanupManager', () => {
       { name: 'machine-1', status: 'running', region: 'iad', volume_names: [] },
     ]);
 
-    (flyctlExecute as any)
-      .mockImplementationOnce(() => Promise.resolve({ stdout: mockVolumes, stderr: '' })) // List volumes
-      .mockImplementationOnce(() => Promise.resolve({ stdout: mockMachines, stderr: '' })) // List machines
-      .mockImplementationOnce(() => Promise.resolve({ stdout: '', stderr: '' })) // Machine show for machine-1
-      .mockImplementationOnce(() => Promise.reject(new Error('Deletion failed'))) // Destroy orphan-volume-1
-      .mockImplementationOnce(() => Promise.resolve({ stdout: '', stderr: '' })); // Destroy orphan-volume-2
+    let callCount = 0;
+    mock.module('../../src/utils/flyctl', () => ({
+      flyctlExecute: () => {
+        callCount++;
+        switch (callCount) {
+          case 1: return Promise.resolve({ stdout: mockVolumes, stderr: '' });
+          case 2: return Promise.resolve({ stdout: mockMachines, stderr: '' });
+          case 3: return Promise.resolve({ stdout: '', stderr: '' });
+          case 4: return Promise.reject(new Error('Deletion failed'));
+          default: return Promise.resolve({ stdout: '', stderr: '' });
+        }
+      },
+    }));
 
     await cleanupManager.cleanupOrphanedResources();
 

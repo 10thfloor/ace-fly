@@ -1,6 +1,6 @@
-import { beforeEach, vi } from 'vitest';
+import { mock } from 'bun:test';
 
 // Mock the `flyctlExecute` utility
-vi.mock('../src/utils/flyctl', () => ({
-  flyctlExecute: vi.fn(),
+mock.module('../../src/utils/flyctl', () => ({
+  flyctlExecute: () => Promise.resolve({ stdout: '', stderr: '' }),
 }));
