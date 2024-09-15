@@ -4,6 +4,7 @@ import type { FlyStack } from "../core/FlyStack";
 import { FlyMachine } from "./FlyMachine";
 import { FlyMachineConfig } from "./FlyMachineConfig";
 import { FlyAutoScalingConfig } from "./FlyAutoScalingConfig";
+import { FlyRegion } from "../types/FlyRegions";
 
 export interface IRemixConstructConfig {
 	name?: string;
@@ -45,7 +46,7 @@ export class RemixConstruct extends StackConstruct {
 				},
 				internalPort: 8080,
 				guest: {
-					cpu_kind: "hobby",
+					cpu_kind: "shared",
 					memory_mb: 256,
 				},
 				volumes: [],
@@ -83,7 +84,7 @@ export class RemixConstruct extends StackConstruct {
 		this.machine = new FlyMachine(this.stack, `${this.getId()}-machine`, {
 			name: `${this.config.name}-machine`,
 			count: 1,
-			regions: ["iad"], // Default to US East
+			regions: [FlyRegion.LOS_ANGELES], 
 			autoScaling: autoScaling,
 			machineConfig: machineConfig,
 			// link: [this.database],

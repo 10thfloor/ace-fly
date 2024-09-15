@@ -3,6 +3,7 @@ import type { FlyStack } from "../core/FlyStack";
 import { FlyMachine } from "../constructs/FlyMachine";
 import { FlyMachineConfig } from "../constructs/FlyMachineConfig";
 import { FlyAutoScalingConfig } from "../constructs/FlyAutoScalingConfig";
+import { FlyRegion } from "../types/FlyRegions";
 
 export interface IFlyServerlessFunctionConfig {
 	name: string;
@@ -51,7 +52,7 @@ export class FlyServerlessFunction extends StackConstruct {
 		this.machine = new FlyMachine(this.getStack(), `${this.getId()}-machine`, {
 			name: this.config.name,
 			machineConfig,
-			regions: ["iad"],
+			regions: [FlyRegion.LOS_ANGELES],
 			count: 1,
 			autoScaling: new FlyAutoScalingConfig(
 				this.getStack(),

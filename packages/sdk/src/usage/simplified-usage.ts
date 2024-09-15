@@ -10,6 +10,7 @@ import { RemixConstruct } from "../sdk/constructs/RemixConstruct.js";
 import { FlyApiClient } from "../sdk/api/FlyApiClient.js";
 import { FlyHttpServiceConcurrencyType } from "../sdk/types/FlyHttpServiceConcurrencyTypes.js";
 import "reflect-metadata";
+import { FlyRegion } from "../sdk/types/FlyRegions.js";
 
 class FlyDeployment extends FlySDK {
 	readonly stack: FlyStack;
@@ -18,7 +19,7 @@ class FlyDeployment extends FlySDK {
 		super(context);
 
 		const apiClient = new FlyApiClient(context.apiToken);
-		this.stack = new FlyStack("my-stack", apiClient);
+		this.stack = new FlyStack("my-stack");
 		
 		const devOrg = new FlyOrg(this.stack, "dev-org", {
 			name: "My Development Organization"
@@ -68,14 +69,13 @@ class FlyDeployment extends FlySDK {
 			domain: devDomain,
 			certificate: devDomainCertificate,
 			secrets: [sessionSecret],
-			regions: ["iad", "lhr"],
+			regions: [FlyRegion.LOS_ANGELES, FlyRegion.LONDON],
 			env: {
 				SESSION_SECRET: "{{ .secrets.SESSION_SECRET }}",
 			},
-			publicServices: {
+			services: {
 				[remixSite.getName()]: webService,
 			},
-			privateServices: {},
 		});
 
 		devOrg.addApp(remixApp);

@@ -25,7 +25,7 @@ class FlyDeployment extends FlySDK {
 	constructor(context: IFlySDKConfig) {
 		super(context);
 
-		this.stack = new FlyStack("my-stack", new FlyApiClient(context.apiToken));
+		this.stack = new FlyStack("my-stack");
 
 		const devOrg = new FlyOrg(this.stack, "dev-org", {
 			name: "My Development Organization",
@@ -215,16 +215,11 @@ class FlyDeployment extends FlySDK {
 			domain: devDomain,
 			certificate: devDomainCertificate,
 			secrets: [secret],
-			regions: ["iad", "lhr"],
+			regions: [FlyRegion.LOS_ANGELES, FlyRegion.LONDON],
+			services: {},
 			env: {
 				MY_SECRET: "{{ .secrets.my-secret }}",
-			},
-			publicServices: {
-				website: publicWebsite,
-			},
-			privateServices: {
-				api: apiProxy,
-			},
+			}
 		});
 	}
 }
