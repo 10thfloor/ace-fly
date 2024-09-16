@@ -9,7 +9,6 @@
     "build": "npm run build:bun && npm run build:types",
     "build:bun": "bun build --sourcemap --target node --outdir ./dist --no-check ./src/index.ts",
     "build:types": "tsc --project tsconfig.json",
-    "start": "bun run src/index.ts",
     "test": "bun run test"
   },
   "devDependencies": {
