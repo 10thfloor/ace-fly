@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+      "outDir": "./build",
+      "rootDir": ".",
+      "target": "ES2022",
+      "module": "ESNext",
+      "moduleResolution": "node",
+      "esModuleInterop": true,
+      "strict": true,
+      "skipLibCheck": true,
+      "composite": true,
+      "paths": {
+        "@ace-flyv2/simple-sdk": ["../simple-sdk/dist/types"]
+      }
+    },
+    "include": ["*.ts"],
+    "exclude": ["node_modules", "build"]
+  }

@@ -1,8 +1,8 @@
-import { flyctlExecute } from "../utils/flyctl";
-import { Logger } from "../utils/logger";
+import { flyctlExecute } from "../utils/flyctl.js";
+import { Logger } from "../utils/logger.js";
 import { exec } from "node:child_process";
 import { promisify } from "node:util";
-import type { CleanupManager } from "../utils/cleanup";
+import type { CleanupManager } from "../utils/cleanup.js";
 
 const execAsync = promisify(exec);
 

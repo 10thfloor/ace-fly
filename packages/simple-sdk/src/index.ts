@@ -1,6 +1,8 @@
-export { App } from './constructs/App';
-export { Machine } from './constructs/Machine';
-export { Database } from './constructs/Database';
-export { Volume } from './constructs/Volume';
-export { Security } from './constructs/Security';
-export { PluginManager } from './plugins/plugin-manager';
+export * from './constructs/App.js';
+export * from './constructs/Machine.js';
+export * from './constructs/Database.js';
+export * from './constructs/Volume.js';
+export * from './constructs/Security.js';
+export * from './plugins/plugin-manager.js';
+export * from './utils/logger.js';
+export * from './utils/cleanup.js';

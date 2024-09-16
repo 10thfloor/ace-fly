@@ -1,21 +1,18 @@
-import { App, Database, Machine, Security } from "../../../src";
-import { Logger } from "../../utils/logger";
-import { CleanupManager } from "../../utils/cleanup";
+import * as sdk from "@ace-flyv2/simple-sdk";
 
-const logger = new Logger();
-const apps: App[] = []; // Initialize with your list of apps if any
-const cleanupManager = new CleanupManager(apps, logger);
+const logger = new sdk.Logger();
+const apps: sdk.App[] = []; // Initialize with your list of apps if any
+const cleanupManager = new sdk.CleanupManager(apps, logger);
 
 async function deploy() {
-    
-  const myApp = new App({
+  const myApp = new sdk.App({
     name: "test-app", // Replace with your actual app name
     region: ["iad", "lhr"], // Primary and additional regions
     environment: "development",
     cleanupManager, // Pass the CleanupManager instance
   });
 
-  const myDatabase = new Database({
+  const myDatabase = new sdk.Database({
     appName: myApp.name,
     name: "your-database-name",
     engine: "postgres",
@@ -24,7 +21,7 @@ async function deploy() {
     cleanupManager, // Pass the CleanupManager instance
   });
 
-  const webMachine = new Machine({
+  const webMachine = new sdk.Machine({
     appName: myApp.name,
     name: "web-machine",
     image: "node:14-alpine",
@@ -32,7 +29,7 @@ async function deploy() {
     cleanupManager, // Pass the CleanupManager instance
   });
 
-  const security = new Security({
+  const security = new sdk.Security({
     appName: myApp.name,
     logger,
     cleanupManager, // Pass the CleanupManager instance

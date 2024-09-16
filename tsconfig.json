@@ -1,0 +1,11 @@
+{
+    "files": [],
+    "references": [
+        {
+            "path": "packages/simple-sdk"
+        },
+        {
+            "path": "packages/examples/simple-web-app"
+        }
+    ]
+}

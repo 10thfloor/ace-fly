@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, beforeEach, mock } from 'bun:test';
 import { CleanupManager } from '../../src/utils/cleanup';
 import { App } from '../../src/constructs/App';
